@@ -2040,7 +2040,7 @@ class CancelamentoPlano(GenericAPIView):
                                 data_fim_vigencia, '%Y%m%d'
                             ).date()
 
-                            if diferenca.days + 1 > 7:
+                            if diferenca.days > 6:
                                 if plano.tipo_plano in (
                                     EnumTipoPlano.OURO,
                                     EnumTipoPlano.DIAMANTE,

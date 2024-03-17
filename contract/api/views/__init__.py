@@ -1535,12 +1535,14 @@ class RegularizarPendenciaAverbacao(GenericAPIView):
                     status=HTTP_400_BAD_REQUEST,
                 )
 
-            arquivo = req_serializer.validated_data.get('arquivo_regularizacao')
-            if arquivo:
+            if arquivo := req_serializer.validated_data.get(
+                    'arquivo_regularizacao'
+            ):
                 regularizacao_contrato.arquivo_regularizacao = arquivo
 
-            mensagem = req_serializer.validated_data.get('mensagem_regularizacao')
-            if mensagem:
+            if mensagem := req_serializer.validated_data.get(
+                    'mensagem_regularizacao'
+            ):
                 regularizacao_contrato.mensagem_regularizacao = mensagem
 
             regularizacao_contrato.data_regularizacao = datetime.now()

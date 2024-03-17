@@ -646,7 +646,7 @@ def contrato_resource_export(isFront):
                 contrato_cartao_beneficio = contrato.contrato_cartao_beneficio.last()
                 if not contrato_cartao_beneficio:
                     return 'N/A'
-                if contrato_cartao_beneficio and contrato_cartao_beneficio.valor_saque:
+                if contrato_cartao_beneficio.valor_saque:
                     return contrato_cartao_beneficio.valor_saque
             return ''
 
@@ -776,10 +776,7 @@ def contrato_resource_export(isFront):
                 contrato_cartao_beneficio = contrato.contrato_cartao_beneficio.last()
                 if not contrato_cartao_beneficio:
                     return 'N/A'
-                if (
-                    contrato_cartao_beneficio
-                    and contrato_cartao_beneficio.valor_parcela
-                ):
+                if contrato_cartao_beneficio.valor_parcela:
                     return contrato_cartao_beneficio.valor_parcela
             return ''
 
@@ -969,9 +966,7 @@ def contrato_resource_export(isFront):
 
         def dehydrate_restricoes(self, contrato):
             restricoes = contrato.contrato_validacoes.all().filter(checked=False)
-            restricoes_list = []
-            for restricao in restricoes:
-                restricoes_list.append(restricao.mensagem_observacao)
+            restricoes_list = [restricao.mensagem_observacao for restricao in restricoes]
             return ''.join(restricoes_list)
 
         def dehydrate_regras_validadas(self, contrato):

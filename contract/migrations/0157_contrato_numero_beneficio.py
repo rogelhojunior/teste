@@ -8,8 +8,9 @@ def popula_contrato(apps, schema_editor):
     DadosIn100 = apps.get_model('consignado_inss', 'DadosIn100')
 
     for contrato in Contrato.objects.all():
-        dados_in100 = DadosIn100.objects.filter(cliente=contrato.cliente).first()
-        if dados_in100:
+        if dados_in100 := DadosIn100.objects.filter(
+                cliente=contrato.cliente
+        ).first():
             numero_beneficio = dados_in100.numero_beneficio
             contrato.numero_beneficio = numero_beneficio
             contrato.save(update_fields=['numero_beneficio'])

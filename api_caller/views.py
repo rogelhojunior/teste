@@ -94,7 +94,7 @@ def build_curl_command(url, method, headers, data):
 
     # Adiciona cabeçalhos
     for header, value in headers.items():
-        curl_cmd += f" --header {shlex.quote(header + ': ' + value)}"
+        curl_cmd += f" --header {shlex.quote(f'{header}: {value}')}"
 
     # Adiciona corpo da solicitação se for um método que permite corpo
     if data and method.upper() in ['POST', 'PUT', 'PATCH']:
