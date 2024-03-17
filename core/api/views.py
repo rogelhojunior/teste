@@ -3076,23 +3076,21 @@ class AvailableOffersAPIView(GenericAPIView):
     def pick_best_benefit_card_offer(
         self,
         margem_rcc: int,
-        margem_rmc: int,
+        margem_rmc: int = 0,
         has_rcc_product: bool,
         has_rmc_product: bool,
     ):
-        if margem_rcc or margem_rmc:
-            if margem_rcc >= margem_rmc:
-                if has_rcc_product:
-                    return {
-                        'tipo_produto': EnumTipoProduto.CARTAO_BENEFICIO,
-                        'margem_atual': margem_rcc,
-                    }
+        if margem_rcc and margem_rcc >= margem_rmc and has_rcc_product:
+            return {
+                'tipo_produto': EnumTipoProduto.CARTAO_BENEFICIO,
+                'margem_atual': margem_rcc,
+            }
 
-            if margem_rmc > 0 and has_rmc_product:
-                return {
-                    'tipo_produto': EnumTipoProduto.CARTAO_CONSIGNADO,
-                    'margem_atual': margem_rmc,
-                }
+        if margem_rmc > 0 and has_rmc_product:
+            return {
+                'tipo_produto': EnumTipoProduto.CARTAO_CONSIGNADO,
+                'margem_atual': margem_rmc,
+            }
 
         return None
 
@@ -3240,8 +3238,8 @@ def import_excel_view(request):
                     cliente_convenio__cliente=cliente
                 ).first()
 
-            tipo_produto = mapeamento_tipos_produto.get(row['Tipo de Produto'], None)
-            tipo_margem = mapeamento_tipos_margem.get(row['Tipo Margem'], None)
+            tipo_produto = mapeamento_tipos_produto.get(row['Tipo de Produto'])
+            tipo_margem = mapeamento_tipos_margem.get(row['Tipo Margem'])
 
             ClienteCartaoBeneficio.objects.update_or_create(
                 cliente=cliente,

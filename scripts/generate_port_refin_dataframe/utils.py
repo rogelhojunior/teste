@@ -103,10 +103,8 @@ def calculate_qi_tech_status(proposal_key) -> str:
         return 'Proposal key is None'
 
     qi_tech_data = qi_getter.get_credit_transfer(proposal_key)
-    status = qi_tech_data.get('proposal_status')
-    if not status:
-        status = 'Não retornado'
-    return status
+
+    return qi_tech_data.get('proposal_status') or 'Não retornado'
 
 
 def calculate_last_tentative_port(proposal_key) -> tuple:

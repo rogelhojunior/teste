@@ -107,7 +107,7 @@ class DataFrameGenerator:
 
         # adding thread
         number_of_rows = self.df.shape[0]
-        for i in range(0, number_of_rows):
+        for i in range(number_of_rows):
             base_value = self.df.loc[i, base_column_name]
             thread_id = self.pool_executor.add_thread(function, base_value)
 

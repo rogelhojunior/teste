@@ -1987,7 +1987,7 @@ def import_excel_view(request):
         records.append(record)
 
     # Divide os registros em grupos de no máximo 100
-    chunks = [records[i : i + 100] for i in range(0, len(records), 100)]
+    chunks = [records[i : i + 100] for i in range(len(records), 100)]
 
     for chunk in chunks:
         payload = {'inclusaoDescontoCartao': chunk}
