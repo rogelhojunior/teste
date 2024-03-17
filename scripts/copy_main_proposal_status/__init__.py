@@ -30,7 +30,9 @@ def run():
 
 
 def get_main_proposal(contract):
-    return Contrato.objects.get(token_envelope=contract.token_envelope, is_main_proposal=1)
+    return Contrato.objects.get(
+        token_envelope=contract.token_envelope, is_main_proposal=1
+    )
 
 
 def clean_contract_status(contract: Contrato):

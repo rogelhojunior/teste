@@ -470,31 +470,30 @@ class EnvioLinkFormalizacaoAPIView(GenericAPIView):
                             'url_formalizacao_curta': '',
                             'motivo_url_indisponivel': f'{status.descricao_mesa}',
                         }
+                    elif (
+                        contrato.cliente
+                        and contrato.cliente.escolaridade
+                        == EnumEscolaridade.ANALFABETO
+                    ):
+                        payload = {
+                            **api_contrato.LinkFormalizacaoAnalfabetoSerializer(
+                                instance=contrato
+                            ).data,
+                            'anexos': [
+                                {
+                                    anexo.nome_anexo: anexo.get_attachment_url,
+                                }
+                                for anexo in AnexoContrato.objects.filter(
+                                    contrato__token_envelope=token_envelope,
+                                    tipo_anexo=EnumTipoAnexo.TERMOS_E_ASSINATURAS,
+                                )
+                                if 'assinado' not in anexo.nome_anexo
+                            ],
+                        }
                     else:
-                        if (
-                            contrato.cliente
-                            and contrato.cliente.escolaridade
-                            == EnumEscolaridade.ANALFABETO
-                        ):
-                            payload = {
-                                **api_contrato.LinkFormalizacaoAnalfabetoSerializer(
-                                    instance=contrato
-                                ).data,
-                                'anexos': [
-                                    {
-                                        anexo.nome_anexo: anexo.get_attachment_url,
-                                    }
-                                    for anexo in AnexoContrato.objects.filter(
-                                        contrato__token_envelope=token_envelope,
-                                        tipo_anexo=EnumTipoAnexo.TERMOS_E_ASSINATURAS,
-                                    )
-                                    if 'assinado' not in anexo.nome_anexo
-                                ],
-                            }
-                        else:
-                            payload = {
-                                'url_formalizacao_curta': f'{url_formalizacao_curta}',
-                            }
+                        payload = {
+                            'url_formalizacao_curta': f'{url_formalizacao_curta}',
+                        }
 
                 else:
                     payload = {
