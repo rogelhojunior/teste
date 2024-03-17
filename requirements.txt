@@ -1,0 +1,64 @@
+# Utilities and external services
+boto3==1.26.115
+
+# Additional libraries for project features
+celery==5.3.0
+channels==4.0.0
+channels-redis==4.1.0
+cryptography==41.0.3
+debugpy==1.8.0
+
+# Essential for Django project
+Django==4.2.3
+django-admin-interface==0.25.0
+django-admin-rangefilter==0.10.0
+django-auditlog==2.2.2
+django-axes==6.0.1
+django-celery-beat==2.5.0
+django-ckeditor
+django-cors-headers==3.13.0
+django-filter==23.5
+django-import-export==3.2.0
+
+# Extras
+django-recaptcha==4.0.0
+django-smart-selects==1.6.0
+django-storages==1.14
+django-tinymce==3.5.0
+django_extensions==3.2.3
+djangorestframework==3.14.0
+djangorestframework-api-key==3.0.0
+djangorestframework-simplejwt==5.2.0
+flower==2.0.1
+geopy==2.3.0
+gevent==22.10.2
+gunicorn==20.1.0
+holidays==0.39
+logtail-python==0.2.6
+most_sdk==0.1.0
+mysqlclient==2.1.1
+newrelic==8.10.0
+numpy==1.24.4
+
+# PyJWT==2.6.0
+# pyOpenSSL==23.2.0
+pandas==2.1.1
+paramiko==3.4.0
+pdf2image==1.17.0
+pycep-correios==5.0.0
+pycpfcnpj==1.7.0
+pydantic==2.4.2
+PyMuPDF==1.23.3
+PyPDF2==2.0.0
+python-decouple==3.8.0
+python-jose==3.3.0
+redis==4.6.0
+reportlab==3.6.12
+requests==2.31.0
+schema==0.7.5
+secure-smtplib==0.1.1
+sentry-sdk==1.39.1
+serasa_sdk==0.1.6
+translate==3.6.1
+Unidecode==1.3.6
+xmltodict==0.13.0

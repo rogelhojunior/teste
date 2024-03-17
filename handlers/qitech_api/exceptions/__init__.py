@@ -1,0 +1,2 @@
+class AdapterNotImplementedError(NotImplementedError):
+    pass

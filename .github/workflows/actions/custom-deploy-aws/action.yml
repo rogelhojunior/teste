@@ -1,0 +1,39 @@
+name: New Revision Task and Deploy service
+description: This Custom Action Allows automate Deployment process on ECS
+inputs:
+  image-id:
+    description: Image used to update task definition
+    required: true
+  task-definition-path:
+    description: Path for task definition in checkout code
+    required: true
+  container-name:
+    description: Name from container defined in task definition
+    required: true
+  service-name:
+    description: ECS service name to be deployed
+    required: true
+  cluster-name:
+    description: ECS Cluster target
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Create New revision Task Definition
+      id: task-definition-update
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ inputs.task-definition-path }}
+        container-name: ${{ inputs.container-name }}
+        image: ${{ inputs.image-id }}
+
+    - name: Deploy and update service ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-definition-update.outputs.task-definition }}
+        service: ${{ inputs.service-name }}
+        cluster: ${{ inputs.cluster-name }}
+
+    - name: Validate Process
+      run: echo "Deployment successful - ${{ inputs.service-name }}"
+      shell: bash

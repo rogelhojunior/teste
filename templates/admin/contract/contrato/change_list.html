@@ -1,0 +1,271 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+<!-- Override extrahead to add Chart.js -->
+
+{#{% block object-tools-items %}#}
+{#    {{ block.super }}#}
+{#    {% if request.user.is_superuser %}#}
+{#        <!-- Botões visíveis somente para super usuários  -->#}
+{#        <li>#}
+{#            <a href="{% url 'contratos_cedidos' %}" class="btn btn-high btn-success">Exportar listas</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="{% url 'recusar_contratos' %}" class="btn btn-high btn-success">Recusar contratos</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="{% url 'contratos_cedidos' %}" class="btn btn-high btn-success">Contratos cedidos</a>#}
+{#        </li>#}
+{#    {% endif %}#}
+{#{% endblock %}#}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-4-grid@3.4.0/css/grid.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="https://kit.fontawesome.com/d4ef929883.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'js/admin.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+    <style>
+
+        .dashboard-stat {
+            position: relative;
+            display: block;
+            margin: 0 5px 50px;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .dashboard-stat .visual {
+            width: 20%;
+            min-width: 60px;
+            height: 10vh;
+            display: block;
+            float: left;
+            padding-top: 1rem;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            font-size: 3.5rem;
+        }
+
+        .dashboard-stat .visual > i {
+            margin-left: -15px;
+            font-size: 100px; /* pode ser ajustado para rem se necessário */
+            line-height: 110px;
+            color: #fff;
+            opacity: 0.1;
+        }
+
+        .dashboard-stat .details {
+            position: absolute;
+            padding-right: 5px;
+            color: #fff;
+            left: 2px;
+            width: 100%;
+        }
+
+        .dashboard-stat .details .number {
+            padding-top: 10px;
+            text-align: right;
+            font-size: 2rem; /* usando rem */
+            line-height: 2.2rem; /* usando rem */
+            letter-spacing: -1px;
+            margin-bottom: 0;
+            font-weight: 300;
+            font-family: "DejaVu Math TeX Gyre";
+        }
+
+        .dashboard-stat .details .number .desc {
+            text-transform: capitalize;
+            text-align: right;
+            font-size: 1rem; /* usando rem */
+            letter-spacing: 0;
+            font-weight: 300;
+        }
+
+        @media screen and (max-width: 600px) {
+            .dashboard-stat .visual {
+                width: 40%; /* ajuste para telas menores */
+                height: 15vh;
+            }
+
+            .dashboard-stat .details .number {
+                font-size: 1.5rem;
+            }
+        }
+
+
+        .dashboard-stat.blue {
+            background-color: #337ab7;
+        }
+
+        .dashboard-stat.red {
+            background-color: #e7505a;
+        }
+
+        .dashboard-stat.orange {
+            background-color: #e79e50;
+        }
+
+        .dashboard-stat.yellow {
+            background-color: #e7bc50;
+        }
+
+        .dashboard-stat.purple {
+            background-color: #8E44AD;
+        }
+
+        .dashboard-stat.hoki {
+            background-color: rgba(7, 133, 82, 0.5);
+        }
+
+        .dashboard-stat.trodi {
+            background-color: rgba(7, 122, 133, 0.5);
+        }
+
+
+        .dashboard-stat.success {
+            background-color: rgba(28, 154, 18, 0.7);
+        }
+
+        .dashboard-stat.dark {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .dashboard-stat.light-green {
+            background-color: rgba(28, 154, 18, 0.5);
+        }
+
+        .dashboard-stat.slate-blue {
+            background-color: rgb(131, 111, 255);
+        }
+
+        .dashboard-stat.gray_port {
+            background-color: rgb(28, 28, 28);
+        }
+
+        .dashboard-stat.gray_port_refin {
+            background-color: rgb(54, 54, 54);
+        }
+
+        .dashboard-stat.gray_margem_livre {
+            background-color: rgb(105, 105, 105);
+        }
+
+        .dashboard-stat.dark-slate-blue {
+            background-color: rgb(72, 61, 139);
+        }
+
+        .dashboard-stat.slate-blue3 {
+            background-color: rgb(105, 89, 205);
+        }
+
+        .dashboard-stat.slate-blue1 {
+            background-color: rgb(131, 111, 255);
+        }
+
+        .dashboard-stat.slate-blue1 {
+            background-color: rgb(131, 111, 255);
+        }
+
+
+        #content h1 {
+            margin: 0 0 20px;
+            font-weight: 300;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .reload-button {
+            margin-right: 20px;
+            margin-bottom: 5px;
+        }
+
+    </style>
+    <script>
+        function storeProductNumber(numberProduct) {
+            localStorage.setItem('numberProduct', numberProduct);
+        }
+    </script>
+    <div class="wrapper container-fluid mb-5">
+        <div class="text-right reload-button">
+            <a href="#" onclick="KPIContrato()"> <span class="fa fa-refresh"></span></a>
+        </div>
+        <div class="splide">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    {% for list in change_list_product %}
+                        <li class="splide__slide" data-tipo-produto="{{ list.id_name }}">
+                            <a class="dashboard-stat mx-6 {{ list.color }}"
+                               href="?tipo_produto__exact={{ list.number }}"
+                               onclick="storeProductNumber('{{ list.number }}')">
+                                <div class="visual">
+                                    <i class="{{ list.icon }}"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number" id="{{ list.id_name}}">
+                                        <div class="loadingio-spinner-reload-pb6lozevp3">
+                                            <div class="ldio-wagf8bzsl1">
+                                                <div>
+                                                    <div></div>
+                                                    <div></div>
+                                                    <div></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="desc">{{ list.type_name }}</div>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                    {% for list in change_list_status %}
+                        <li class="splide__slide" data-tipo-produto="{{ list.id_name }}">
+                            <a class="dashboard-stat mx-6 {{ list.color }}" href="?status={{ list.number }}">
+                                <div class="visual">
+                                    <i class="{{ list.icon }}"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number" id="{{ list.id_name }}">
+                                        <div class="loadingio-spinner-reload-pb6lozevp3">
+                                            <div class="ldio-wagf8bzsl1">
+                                                <div>
+                                                    <div></div>
+                                                    <div></div>
+                                                    <div></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="desc">{{ list.type_name }}</div>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Render the rest of the ChangeList view by calling block.super -->
+    {{ block.super }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let numberProduct = localStorage.getItem('numberProduct');
+            if (numberProduct) {
+                let links = document.querySelectorAll('.splide__slide a');
+                links.forEach(function (link) {
+                    let originalHref = link.getAttribute('href');
+                    if (originalHref.includes("?status=")) {
+                        link.setAttribute('href', originalHref + '&tipo_produto__exact=' + numberProduct);
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

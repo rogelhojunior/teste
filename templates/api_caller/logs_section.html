@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<h2>Últimas Chamadas</h2>
+<ul>
+    {% for log in logs %}
+    <li>
+        <div class="wrapper-box">
+            <div>
+                <strong>URL:</strong> {{ log.url }} |
+                <strong>Method:</strong> {{ log.method }} |
+                <strong>Response Status:</strong> {{ log.response_status_code }}
+            </div>
+            <span class="expand-icon" data-log-id="{{ log.id }}"><i class="fas fa-chevron-right"></i></span>
+        </div>
+
+        <div class="log-detail" id="log-detail-{{ log.id }}">
+            <br>
+            <strong>Headers:</strong><pre style="white-space: pre-wrap; word-wrap: break-word;">{{ log.headers }}</pre>
+            <strong>Body:</strong><pre style="white-space: pre-wrap; word-wrap: break-word;">{{ log.body }}</pre>
+            <strong>Response:</strong><pre style="white-space: pre-wrap; word-wrap: break-word;">{{ log.response_content }}</pre>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if logs.has_previous %}
+            <a class="paginate-link" href="?page=1" data-page="1">&laquo; Primeiro</a>
+            <a class="paginate-link" href="?page={{ logs.previous_page_number }}" data-page="{{ logs.previous_page_number }}">Anterior</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ logs.number }} of {{ logs.paginator.num_pages }}.
+        </span>
+
+        {% if logs.has_next %}
+            <a class="paginate-link" href="?page={{ logs.next_page_number }}" data-page="{{ logs.next_page_number }}">Próximo</a>
+            <a class="paginate-link" href="?page={{ logs.paginator.num_pages }}" data-page="{{ logs.paginator.num_pages }}">Ultimo &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Inicialmente, escondemos todos os detalhes dos logs
+        $(".log-detail").hide();
+
+        // Adiciona o evento de clique ao ícone de expansão
+        $(".expand-icon").on("click", function() {
+            var logId = $(this).data("log-id");
+            var detailsDiv = $("#log-detail-" + logId);
+
+            // Toggle (alterna) a visibilidade dos detalhes do log
+            detailsDiv.toggle();
+
+            // Alterna o ícone de seta
+            if (detailsDiv.is(":visible")) {
+                 $(this).find('i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+            } else {
+                $(this).find('i').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Estiliza o ícone de expansão para parecer um link clicável */
+    .expand-icon {
+        cursor: pointer;
+        color: #4a90e2;
+    }
+
+    .wrapper-box{
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+    }
+</style>

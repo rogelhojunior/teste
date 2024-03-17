@@ -1,0 +1,66 @@
+[
+{
+  "model": "core.cliente",
+  "pk": 1,
+  "fields": {
+    "tipo_cliente": 1,
+    "nome_cliente": "Teste ",
+    "nu_cpf": "027.830.209-20"
+  }
+},
+{
+  "model": "contract.contrato",
+  "pk": 1,
+  "fields": {
+    "criado_em": "2023-10-24T23:10:11.039Z",
+    "ultima_atualizacao": "2023-10-25T15:17:07.294Z",
+    "tipo_produto": 6,
+    "cliente": 1,
+    "status": 5,
+    "cd_contrato_tipo": 4,
+    "token_envelope": "d36317ec-c1e1-4e36-a5e5-1d92266a9fc5"
+  }
+},
+{
+  "model": "contract.anexocontrato",
+  "pk": 1,
+  "fields": {
+    "contrato": 1,
+    "tipo_anexo": 2,
+    "nome_anexo": "d36317ec-c1e1-4e36-a5e5-1d92266a9fc5_cnh",
+    "anexo_extensao": "jpg",
+    "anexo_url": "https://documentos-cliente-inss-stage.s3.amazonaws.com/d1000dfe-c7b2-431b-8476-f5e2b03a3d2f/d36317ec-c1e1-4e36-a5e5-1d92266a9fc5_cnh.jpg?AWSAccessKeyId=AKIATXIY74L2R6GWXD4F&Signature=Oj%2FwLIj90Pu7GvDP%2Bfp%2B6CrT24U%3D&Expires=1730556364",
+    "arquivo": "",
+    "anexado_em": "2023-10-24T23:10:36.926Z"
+  }
+},
+{
+  "model": "contract.anexocontrato",
+  "pk": 2,
+  "fields": {
+    "contrato": 1,
+    "tipo_anexo": 2,
+    "nome_anexo": "termo-de-consentimento-18650865844-24102023",
+    "anexo_extensao": "pdf",
+    "anexo_url": "https://termos-amigoz-stage.s3.amazonaws.com/c759d9bb-b67a-4930-8f5d-12fef475ce74/termo-de-consentimento-18650865844-24102023.pdf?AWSAccessKeyId=AKIATXIY74L2R6GWXD4F&Signature=BScsmlH4Pv302eKIslI5ooQqutc%3D&Expires=1729708663",
+    "arquivo": "",
+    "anexado_em": "2023-10-24T23:10:36.926Z"
+  }
+},
+{
+  "model": "contract.envelopecontratos",
+  "pk": 2461,
+  "fields": {
+    "token_envelope": "d36317ec-c1e1-4e36-a5e5-1d92266a9fc5",
+    "id_processo_unico": "baf1cd72-955b-429b-a869-e8fea912664e",
+    "id_transacao_confia": null,
+    "mensagem_confia": null,
+    "score_unico": "60.0",
+    "status_unico": null,
+    "criado_em": "2023-10-24T23:10:10.543Z",
+    "inicio_digitacao": 1698188926,
+    "fim_digitacao": 1698189046,
+    "duracao_digitacao": 120
+  }
+}
+]

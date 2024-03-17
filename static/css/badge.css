@@ -1,0 +1,23 @@
+.project {
+    background-attachment: fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: end;
+
+    .badge {
+        &.diagonal {
+            white-space: nowrap;
+            position: fixed; /* absolute or fixed */
+            padding: 5px 100px;
+            min-width: 300px;
+            transform: rotate(45deg) translate(37%, 0);
+            color: white;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 12px;
+            top: -20px;
+            box-sizing: border-box;
+            background-color: orange;
+        }
+    }
+}

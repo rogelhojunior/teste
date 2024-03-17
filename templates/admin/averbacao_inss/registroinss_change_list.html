@@ -1,0 +1,201 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block object-tools-items %}
+    <style>
+        .btn {
+            background-color: var(--admin-interface-module-background-color);
+            border: none;
+            color: var(--admin-interface-module-text-color);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0.2rem 14px;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .btn:hover {
+            filter: brightness(0.95);
+        }
+
+        .btn:active {
+            filter: brightness(0.9);
+        }
+
+        /* Estilizando o botão de abertura do modal */
+        .modalBtn {
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .modalActionBtn {
+            border-radius: 4px;
+            padding: 8px 16px;
+        }
+
+        .btnSuccess {
+            background-color: #44B78B !important;
+        }
+        .btnImport {
+            background-color: #3d93b6 !important;
+        }
+
+        .btnDanger {
+            background-color: #DD4646 !important;
+        }
+
+        .checkboxWrapper input {
+            margin: 1px 4px 0 0;
+        }
+
+        /* Estilizando o modal */
+        .modalBackdrop {
+            display: none; /* Ocultando o modal inicialmente */
+            position: fixed; /* Posicionando o modal como fixo */
+            z-index: 99999; /* Definindo uma ordem de empilhamento maior que a do conteúdo normal */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4); /* Definindo uma cor de fundo escura e translúcida */
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10%;
+        }
+
+        /* Estilizando o conteúdo do modal */
+        .modal {
+            width: 550px;
+            max-width: 90%;
+            border-radius: 10px; /* Adicionando borda arredondada */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Adicionando sombra */
+            overflow: auto;
+        }
+
+        .modal .modalHeader {
+            background-color: var(--admin-interface-module-background-color);
+            padding: 12px 24px;
+            color: var(--admin-interface-module-text-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal .modalHeader .modalTitle {
+            margin: 0;
+        }
+
+        /* Estilizando o botão de fechamento do modal */
+        .modal .modalHeader .modalCloseBtn {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--admin-interface-module-text-color);
+            background-color: transparent;
+            border-radius: 10px;
+            border: none;
+            height: 30px;
+            width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estilizando o botão de fechamento do modal ao passar o mouse por cima */
+        .modal .modalHeader .modalCloseBtn:hover,
+        .modal .modalHeader .modalCloseBtn:focus {
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .modal .modalContent {
+            background-color: #fefefe;
+            padding: 20px;
+        }
+
+        .modal .modalContent .modalText {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .modal .modalContent form textarea {
+            width: 100%;
+            margin-top: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .modal .modalFooter {
+            display: flex;
+            justify-content: end;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+    </style>
+
+    {{ block.super }} <!-- Mantendo os botões existentes -->
+
+    <!-- Ação para abrir o modal de importação de Excel -->
+    <li class="objectaction-item modalBox">
+        <a class="btn modalBtn btnImport" title="Importar Excel">
+            IMPORTAR EXCEL
+        </a>
+        <div class="modalBackdrop">
+            <div class="modal">
+                <div class="modalHeader">
+                    <h2 class="modalTitle">Importar Excel</h2>
+                    <button class="modalCloseBtn">&times;</button>
+                </div>
+
+                <div class="modalContent">
+                    <h2 class="modalText">Selecione o arquivo Excel que deseja importar:</h2>
+
+                    <!-- Formulário para importação do Excel -->
+                    <form method="post" enctype="multipart/form-data" action="{% url 'import_excel' %}">
+                        {% csrf_token %}
+                        <input type="file" name="excel_file" required>
+                        <div class="modalFooter">
+                            <button type="button"
+                                    class="btn modalActionBtn btnDanger modalCancelBtn" data-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                Importar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <script>
+        // Script para gerenciar o comportamento do modal
+        document.addEventListener('DOMContentLoaded', function() {
+            let modalBackdrop = document.querySelector('.modalBackdrop');
+            let modalCloseBtn = document.querySelector('.modalCloseBtn');
+            let modalBtn = document.querySelector('.modalBtn');
+
+            // Abrir modal
+            modalBtn.addEventListener('click', function() {
+                modalBackdrop.style.display = "flex";
+            });
+
+            // Fechar modal
+            modalCloseBtn.addEventListener('click', function() {
+                modalBackdrop.style.display = "none";
+            });
+
+            // Fechar modal ao clicar fora dele
+            modalBackdrop.addEventListener('click', function(event) {
+                if (event.target === modalBackdrop) {
+                    modalBackdrop.style.display = "none";
+                }
+            });
+        });
+    </script>
+{% endblock %}

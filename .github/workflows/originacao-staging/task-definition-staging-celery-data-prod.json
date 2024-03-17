@@ -1,0 +1,51 @@
+{
+    "family": "task-byx-originacao-celery-staging-data-prod",
+    "containerDefinitions": [
+        {
+            "name": "container-byx-originacao-celery-staging-data-prod",
+            "image": "256139846389.dkr.ecr.us-east-1.amazonaws.com/byx-originacao-staging:f3157f31d6e690af07b15b8c87efa8ec5043675f",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "NEW_RELIC_APP_NAME",
+                    "value": "originacao-staging-data-prod"
+                },
+                {
+                    "name": "CNAME",
+                    "value": "celery"
+                }
+            ],
+            "environmentFiles": [
+                {
+                    "value": "arn:aws:s3:::byxenvs/originacao/staging/replica-staging/.env",
+                    "type": "s3"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/task-byx-originacao-celery-staging-data-prod",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "taskRoleArn": "arn:aws:iam::256139846389:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::256139846389:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "1024",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    }
+}

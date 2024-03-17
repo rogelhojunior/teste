@@ -1,0 +1,322 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls import_export_tags %}
+{% block extrahead %}{{ block.super }}
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+    {{ form.media }}
+{% endblock %}
+
+{% block breadcrumbs_last %}
+    {% trans "Export" %}
+{% endblock %}
+
+{% block content %}
+    <style>
+        /* Estilos para os cards */
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+            width: 150px;
+            cursor: pointer;
+            height: 150px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img {
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Estilos para os modais */
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 15% auto;
+            padding: 20px;
+            width: 40%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="date"] {
+            width: 80%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <div class="card" onclick="openModal('modal-digitacao')">
+        <img src="{% static 'images_export/data_digitacao.svg' %}" alt="Data Digitação" width="100">
+        <p>Produto/Status</p>
+    </div>
+    <div class="card" onclick="openModal('modal-finalizacao')">
+        <img src="{% static 'images_export/data_finalizacao.svg' %}" alt="Data Finalização" width="100">
+        <p>Finalização</p>
+    </div>
+    <div class="card" onclick="openModal('modal-retorno')">
+        <img src="{% static 'images_export/data_retorno_saldo.svg' %}" alt="Data Retorno Saldo" width="100">
+        <p>Retorno de Saldo</p>
+    </div>
+
+    <!-- Modais para inserção de datas -->
+    <form action="" method="POST" onsubmit="return validateDates('data_inicio_digitacao', 'data_final_digitacao');">
+
+        {% csrf_token %}
+
+        <!-- Modal para Data Digitação -->
+        <div id="modal-digitacao" class="modal">
+            <input type="hidden" name="tipo_exportacao" value="geral">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal-digitacao')">&times;</span>
+                <h2>Tipo Produto</h2>
+                <select name="tipo_produto" id="tipo_produto" required multiple>
+                    <option value=12>Portabilidade</option>
+                    <option value=7>Cartão Benefício</option>
+                    <option value=15>Cartão Consignado</option>
+                    <option value=14>Saque Complementar</option>
+                    <option value=16>Margem Livre</option>
+                    <option value=17>Portabilidade + Refinanciamento</option>
+                </select>
+                <h2>Status</h2>
+                <select name="status" id="status" required>
+                    <option value=0>Todos os Status</option>
+                    {% for item in status_list %}
+                        <option value="{{ item.status }}">{{ item.status_name }}</option>
+                    {% endfor %}
+                </select>
+                <h2>Data Digitação</h2>
+                <label for="data_inicio_digitacao">Data de Início(Digitação) :</label>
+                <input type="date" name="data_inicio" id="data_inicio_digitacao" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}"
+                       required>
+                <label for="data_final_digitacao">Data Final(Digitação): </label>
+                <input type="date" name="data_fim" id="data_final_digitacao" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}"
+                       required>
+                <!-- Seleção de formato -->
+                <fieldset class="module aligned">
+                    {% for field in form %}
+                        <div class="form-row">
+                            {{ field.errors }}
+
+                            {{ field.label_tag }}
+
+                            {{ field }}
+
+                            {% if field.field.help_text %}
+                                <p class="help">{{ field.field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </fieldset>
+
+                <div class="submit-row">
+                    <input type="submit" id="submitModalButtonDigitacao" class="default" value="{% trans "Submit" %}">
+                </div>
+            </div>
+        </div>
+    </form>
+    <form action="" method="POST" onsubmit="return validateDates('data_inicio_finalizacao', 'data_final_finalizacao');">
+        {% csrf_token %}
+
+        <!-- Modal para Data de Finalização -->
+        <div id="modal-finalizacao" class="modal">
+            <input type="hidden" name="tipo_exportacao" value="finalizacao">
+            <div class="modal-content">
+                <h2>Tipo Produto</h2>
+                <select name="tipo_produto" id="tipo_produto" required multiple>
+                    <option value=12>Portabilidade</option>
+                    <option value=7>Cartão Benefício</option>
+                    <option value=15>Cartão Consignado</option>
+                    <option value=14>Saque Complementar</option>
+                    <option value=3>Cartão Benefício Representante</option>
+                    <option value=16>Margem Livre</option>
+                    <option value=17>Portabilidade + Refinanciamento</option>
+                </select>
+                <span class="close" onclick="closeModal('modal-finalizacao')">&times;</span>
+                <h2>Data de Finalização</h2>
+                <label for="data_inicio_finalizacao">Data de Início(Integração) :</label>
+                <input type="date" name="data_inicio" id="data_inicio_finalizacao" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}"
+                       required>
+                <label for="data_final_finalizacao">Data Final(Integração) :</label>
+                <input type="date" name="data_fim" id="data_final_finalizacao" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}"
+                       required>
+                <fieldset class="module aligned">
+                    {% for field in form %}
+                        <div class="form-row">
+                            {{ field.errors }}
+
+                            {{ field.label_tag }}
+
+                            {{ field }}
+
+                            {% if field.field.help_text %}
+                                <p class="help">{{ field.field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </fieldset>
+
+                <div class="submit-row">
+                    <input type="submit" id="submitModalButtonFinalizacao" class="default" value="{% trans "Submit" %}">
+                </div>
+            </div>
+
+        </div>
+    </form>
+    <form action="" method="POST" onsubmit="return validateDates('data_inicio_retorno', 'data_final_retorno');">
+        {% csrf_token %}
+
+        <!-- Modal para Data de Retorno de Saldo -->
+        <div id="modal-retorno" class="modal">
+            <input type="hidden" name="tipo_exportacao" value="retorno_saldo">
+            <div class="modal-content">
+                <h2>Tipo Produto</h2>
+                <select name="tipo_produto" id="tipo_produto" required multiple>
+                    <option value=12>Portabilidade</option>
+                    <option value=17>Portabilidade + Refinanciamento</option>
+                </select>
+                <span class="close" onclick="closeModal('modal-retorno')">&times;</span>
+                <h2>Data de Retorno de Saldo</h2>
+                <label for="data_inicio_retorno">Data de Início (Ultima Atualização):</label>
+                <input type="date" name="data_inicio" id="data_inicio_retorno" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}" required>
+                <label for="data_final_retorno">Data Final (Ultima Atualização):</label>
+                <input type="date" name="data_fim" id="data_final_retorno" max="{% now 'Y-m-d' %}"
+                       value="{% now 'Y-m-d' %}" required>
+                <fieldset class="module aligned">
+                    {% for field in form %}
+                        <div class="form-row">
+                            {{ field.errors }}
+
+                            {{ field.label_tag }}
+
+                            {{ field }}
+
+                            {% if field.field.help_text %}
+                                <p class="help">{{ field.field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </fieldset>
+
+                <div class="submit-row">
+                    <input type="submit" id="submitModalButtonRetorno" class="default" value="{% trans "Submit" %}">
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+        function validateDates(startDateId, endDateId) {
+            const startDate = new Date(document.getElementById(startDateId).value);
+            const endDate = new Date(document.getElementById(endDateId).value);
+            const oneDay = 24 * 60 * 60 * 1000; // horas*minutos*segundos*milliseconds
+            const diffDays = Math.round(Math.abs((endDate - startDate) / oneDay));
+
+            if (startDate > endDate) {
+                alert('A data de início não pode ser posterior à data final.');
+                return false; // Prevent the form from being submitted
+            }
+            if (diffDays > 31) {
+                alert("Intervalo de data ultrapassa 31 dias.");
+                return false;
+            }
+            return true;
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('submitModalButtonDigitacao').addEventListener('click', function (event) {
+            closeModal('modal-digitacao');
+            location.reload();
+        });
+        document.getElementById('submitModalButtonFinalizacao').addEventListener('click', function (event) {
+            closeModal('modal-finalizacao');
+            location.reload();
+        });
+        document.getElementById('submitModalButtonRetorno').addEventListener('click', function (event) {
+            closeModal('modal-retorno');
+            location.reload();
+        });
+        var forms = document.querySelectorAll('form');
+
+        forms.forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                // Adiciona um pequeno atraso para garantir que os dados sejam enviados antes de limpar
+                setTimeout(function () {
+                    form.reset();
+                }, 100);
+            });
+        });
+    </script>
+{% endblock %}

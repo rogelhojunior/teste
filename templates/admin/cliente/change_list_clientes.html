@@ -1,0 +1,36 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    <style>
+        #import-excel-button {
+            background-color: var(--admin-interface-module-background-color);
+            color: var(--admin-interface-module-text-color);
+            border: none;
+            border-radius: 15px;
+            padding: 0.5rem 14px;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+    </style>
+    <li class="objectaction-item">
+        <form action="{% url 'import_excel_cartao' %}" method="post" enctype="multipart/form-data" id="excel-import-form">
+            {% csrf_token %}
+            <input type="file" name="excel_file" id="excel-file-input" style="display: none;">
+            <button type="button" id="import-excel-button">IMPORTAR CARTÃO</button>
+        </form>
+    </li>
+    {{ block.super }}
+<script>
+    document.getElementById('import-excel-button').addEventListener('click', function() {
+        document.getElementById('excel-file-input').click();
+    });
+
+    document.getElementById('excel-file-input').addEventListener('change', function() {
+        document.getElementById('excel-import-form').submit();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,191 @@
+name: BUILD and DEPLOY - STAGING
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - release
+
+env:
+  AWS_REGION: us-east-1
+  ROLE_TO_ASSUME: arn:aws:iam::256139846389:role/github-role
+  ECR_REPOSITORY: byx-originacao-staging
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-image:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+
+    outputs:
+      image_builded: ${{ steps.image-outputs.outputs.image }}
+      short_sha: ${{ steps.sha-output.outputs.sha }}
+
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Set short sha
+        id: sha-output
+        run: |
+          echo "sha=$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
+
+      - name: "Configure AWS Providers"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME}}
+          role-session-name: ecr-${{ steps.sha-output.outputs.sha }}-push-image
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: "no"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push
+        id: build-image-docker
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          provenance: false
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Image Output
+        id: image-outputs
+        run: |
+          echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: validate env
+        run: |
+          echo "${{ steps.image-outputs.outputs.image }}"
+          echo "${{ steps.sha-output.outputs.sha }}"
+
+  deployment:
+    runs-on: ubuntu-latest
+    needs: build-image
+    env:
+      CLUSTER_ORIGINACAO_STAGING: originacao-staging
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: "Configure AWS Providers"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          role-session-name: task-${{ needs.build-image.outputs.short_sha }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Service Deployment - service-byx-originacao-celery-1
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-celery-1
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-celery-1.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-celery-staging-1
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-celery-beat-1
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: 	service-byx-originacao-celery-beat-1
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-celery-beat-1.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-celery-beat-staging-1
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - 	service-byx-originacao-celery-brb
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-celery-brb
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-celery-brb.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-celery-staging-brb
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-celery-data-prod
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-celery-data-prod
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-celery-data-prod.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-celery-staging-data-prod
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-celery-digimais
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-celery-digimais
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-celery-digimais.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-celery-staging-digimais
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-django-1
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-django-1
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-django-1.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-django-staging-1
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-django-brb
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-django-brb
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-django-brb.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-django-staging-brb
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-django-data-prod
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-django-data-prod
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-django-data-prod.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-django-staging-data-prod
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-byx-originacao-django-digimais
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-byx-originacao-django-digimais
+          task-definition-path: .github/workflows/originacao-staging/task-definition-staging-django-digimais.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-django-staging-digimais
+          image-id: ${{ needs.build-image.outputs.image_builded }}
+
+      - name: Service Deployment - service-originacao-flower-staging
+        uses: ./.github/workflows/actions/custom-deploy-aws
+        with:
+          service-name: service-originacao-flower-staging
+          task-definition-path: .github/workflows/flower/staging/task-definition-staging-flower.json
+          cluster-name: ${{ env.CLUSTER_ORIGINACAO_STAGING }}
+          container-name: container-byx-originacao-flower-staging-1
+          image-id: ${{ needs.build-image.outputs.image_builded }}

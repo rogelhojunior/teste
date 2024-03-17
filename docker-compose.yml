@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: DockerComposefile
+    container_name: django
+    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "manage.py", "runserver", "0.0.0.0:8000"]
+    networks:
+      - ls
+    volumes:
+      - .:/core
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    depends_on:
+      - mysql
+      # - localstack
+      - redis
+
+  celery:
+    build:
+      context: .
+      dockerfile: DockerComposefile
+    container_name: celery
+    command: ["celery", "-A", "core", "worker", "-l", "info"]
+    networks:
+      - ls
+    volumes:
+      - .:/core
+    depends_on:
+      - django
+
+  # localstack:
+  #   container_name: aws-localstack
+  #   hostname: localstack.dev
+  #   image: localstack/localstack
+  #   restart: always
+  #   networks:
+  #     - ls
+  #   ports:
+  #     - "127.0.0.1:4566:4566"
+  #     - "127.0.0.1:4571:4571"
+  #   environment:
+  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  #     - DEFAULT_REGION=${AWS_DEFAULT_REGION}
+  #     - SERVICES=dynamodb,sqs,s3
+  #     - DEBUG=${DEBUG-}
+  #     - DATA_DIR=${DATA_DIR-}
+  #     - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+  #     - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
+  #     - DOCKER_HOST=unix:///var/run/docker.sock
+  #     - DISABLE_CORS_CHECKS=1
+  #   volumes:
+  #     - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+
+  mysql:
+    container_name: mysql-database
+    hostname: mysql-database.dev
+    image: mysql:latest
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ls
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_DEFAULT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DEFAULT_NAME}
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: "redis:latest"
+    hostname: redis.dev
+    container_name: redis
+    networks:
+      - ls
+
+  #sonarqube:
+  #  image: sonarqube:latest
+  #  ports:
+  #    - "9000:9000"
+  #  environment:
+  #    - sonar.jdbc.username=sonar
+  #    - sonar.jdbc.password=sonar
+  #    - sonar.jdbc.url=jdbc:postgresql://db:5432/sonardb
+  #    - sonar.web.javaAdditionalOpts=-server
+  #  depends_on:
+  #    - db
+
+  #db:
+  #  image: postgres:latest
+  #  environment:
+  #    - POSTGRES_USER=sonar
+  #    - POSTGRES_PASSWORD=sonar
+  #    - POSTGRES_DB=sonardb
+  #  volumes:
+  #    - postgresql_data:/var/lib/postgresql/data/
+
+volumes:
+  # postgresql_data:
+  mysql-data:
+
+networks:
+    ls:
+      name: ls

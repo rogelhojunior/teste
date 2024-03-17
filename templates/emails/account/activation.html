@@ -1,0 +1,65 @@
+<div style="background-color:#ddd;padding-left:15px:padding-right:15px;">
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding:10px;">
+		<tr bgcolor="#ffffff">
+			<td align="center">
+				<img src="{{ email_logo }}" style="max-width: 200px; max-height: auto;">
+			</td>
+		</tr>
+
+		<tr bgcolor="#ffffff">
+			<td align="center">
+				<br>
+				<h3 style="color:#666;">Bem vindo {{ name }}</h3>
+
+				<p style="color:#666;max-width:400px;">
+					Cadastro criado com sucesso! Para acessar a plataforma
+					clique no botão abaixo e informe suas credenciais.
+				</p>
+
+				<br>
+
+				<table>
+					<tr>
+						<td>Login</td><td><b>{{ login }}</b></td>
+					</tr>
+
+					<tr>
+						<td>Senha</td><td><b>{{ password }}</b></td>
+					</tr>
+				</table>
+
+				<br>
+				<br>
+
+				<table>
+					<tr>
+						<td class=”button” bgcolor="#008000" style="text-align:center;width:160px;padding:5px;border-radius:15px;color:#fff;">
+							<a class=”link” href="{{ login_url }}" target="_blank" style="color:white !important;text-decoration:none">
+								Acessar plataforma</a>
+						</td>
+					</tr>
+				</table>
+
+				<br>
+				<br>
+				<p style="color:#666;max-width:400px;">
+						Gostaríamos de destacar que a senha inicial fornecida é temporária e deverá ser usada
+                    exclusivamente para o seu primeiro acesso ao sistema. Após este login inicial, será imprescindível
+                    que você crie uma nova senha pessoal. Esta medida é essencial para garantir a segurança da sua
+                    conta. No seu próximo acesso, você será automaticamente direcionado(a) para uma página onde poderá
+                    definir uma senha própria, de sua preferência. Agradecemos pela sua colaboração e compreensão em
+                    manter a segurança do nosso sistema.
+
+					</p>
+				<br>
+
+				<hr>
+				<p style="color:#888;max-width:400px;">
+					Para outras dúvidas informe o administrador ou entre em
+					contato com o suporte pelo email {{ support_email }}
+				</p>
+				<br>
+			</td>
+		</tr>
+	</table>
+</div>

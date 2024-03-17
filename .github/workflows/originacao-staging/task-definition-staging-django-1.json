@@ -1,0 +1,56 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "container-byx-originacao-django-staging-1",
+      "image": "256139846389.dkr.ecr.us-east-1.amazonaws.com/byx-originacao-staging:latest",
+      "portMappings": [
+        {
+          "name": "container-byx-originacao-django-staging-1-80-tcp",
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "CNAME",
+          "value": "django"
+        },
+        {
+          "name": "NEW_RELIC_APP_NAME",
+          "value": "originacao-staging-1"
+        }
+      ],
+      "environmentFiles": [
+        {
+          "value": "arn:aws:s3:::byxenvs/originacao/staging/.env",
+          "type": "s3"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/task-byx-originacao-django-staging-1",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "family": "task-byx-originacao-django-staging-1",
+  "taskRoleArn": "arn:aws:iam::256139846389:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::256139846389:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "2048",
+  "memory": "4096",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

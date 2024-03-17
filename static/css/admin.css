@@ -1,0 +1,14 @@
+
+.aligned label {
+    font-weight: bold;
+    color: #222;
+}
+
+.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
+    width: 150px;
+}
+
+
+.envelope div.readonly {
+    width: 100% !important;
+}

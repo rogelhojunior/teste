@@ -1,0 +1,19 @@
+Bem vindo {{ name }}
+
+Cadastro criado com sucesso! Para acessar a plataforma
+clique no link {{ login_url }} e informe suas credenciais.
+
+
+    - Login: {{ login }}
+    - Senha: {{ password }}
+
+
+
+Essa senha é temporária e recomendamos que ela seja alterada
+por uma de sua preferência assim que acessar o sistema.
+Caso tenha dificuldade para acessar você pode
+pode recuperar sua senha nesse link {{ reset_url }}
+
+
+Para outras dúvidas informe o administrador ou entre em
+contato com o suporte pelo email {{ support_email }}

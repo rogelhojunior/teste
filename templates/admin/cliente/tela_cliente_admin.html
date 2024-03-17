@@ -1,0 +1,186 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block object-tools %}
+    {% if change %}{% if not is_popup %}
+        <style>
+
+            /* Estilizando o botão de fechamento do modal */
+            .modal .modalHeader .modalCloseBtn {
+                font-size: 28px;
+                font-weight: bold;
+                color: var(--admin-interface-module-text-color);
+                background-color: transparent;
+                border-radius: 10px;
+                border: none;
+                height: 30px;
+                width: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Estilizando o botão de fechamento do modal ao passar o mouse por cima */
+            .modal .modalHeader .modalCloseBtn:hover,
+            .modal .modalHeader .modalCloseBtn:focus {
+                cursor: pointer;
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .modal .modalContent {
+                background-color: #fefefe;
+                padding: 20px;
+            }
+
+            .modal .modalContent .modalText {
+                margin: 0;
+                font-weight: normal;
+            }
+
+            .modal .modalContent form textarea {
+                width: 100%;
+                margin-top: 10px;
+                box-sizing: border-box;
+                resize: vertical;
+                min-height: 60px;
+            }
+
+            .modal .modalFooter {
+                display: flex;
+                justify-content: end;
+                gap: 8px;
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }
+
+            #modalBtn {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 0.2rem 14px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 12px;
+                margin-bottom: 20px;
+                cursor: pointer;
+                font-weight: normal;
+            }
+
+            #salvarBtn {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 12px;
+                border-radius: 8px;
+                padding: 0.2rem 14px;
+                margin-left: 5px;
+            }
+
+            #cancelarBtn {
+                background-color: red;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 12px;
+                border-radius: 8px;
+                padding: 0.2rem 14px;
+
+            }
+
+            #check_pendenciamento {
+                text-align: center;
+                text-decoration: none;
+            }
+
+            /* Estilizando o modal */
+            .modal {
+                display: none; /* Ocultando o modal inicialmente */
+                position: fixed; /* Posicionando o modal como fixo */
+                z-index: 99999; /* Definindo uma ordem de empilhamento maior que a do conteúdo normal */
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4); /* Definindo uma cor de fundo escura e translúcida */
+            }
+
+            /* Estilizando o conteúdo do modal */
+            .modal-content {
+                background-color: #fefefe;
+                margin: 10% auto; /* Centralizando verticalmente */
+                padding: 20px;
+                border: 1px solid #888;
+                width: 30%;
+                border-radius: 10px; /* Adicionando borda arredondada */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Adicionando sombra */
+            }
+
+            /* Estilizando o botão de fechamento do modal */
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            /* Estilizando o botão de fechamento do modal ao passar o mouse por cima */
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+        </style>
+        <ul class="object-tools">
+            <li class="objectaction-item">
+                <a href="/cancelamento/tem-saude/?id_cliente={{ object_id }}"
+                   title="Cancelar tem saude" style="background-color: palevioletred" class="meuBotao">
+                    CANCELAR TEM SAUDE
+                </a>
+            </li>
+            <script>
+                const botoes = document.querySelectorAll('.meuBotao');
+                for (const botao of botoes) {
+                    let botaoClicado = false;
+                    botao.addEventListener('click', (event) => {
+                        if (botaoClicado) {
+                            event.preventDefault();
+                        } else {
+                            botaoClicado = true;
+                        }
+                    });
+                }
+
+                const modals = Array.from(document.getElementsByClassName("modalBox"));
+
+            </script>
+
+            {% block object-tools-items %}
+                {% change_form_object_tools %}
+            {% endblock %}
+
+
+        </ul>
+
+    {% endif %}{% endif %}
+
+{% endblock %}
+
+
+<div>
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+    {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+    {% if errors %}
+        <p class="errornote">
+            {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}
+                {% translate "Please correct the errors below." %}{% endif %}
+        </p>
+        {{ adminform.form.non_field_errors }}
+    {% endif %}
+
+
+</div>

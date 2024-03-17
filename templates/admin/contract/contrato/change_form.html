@@ -1,0 +1,92 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/alerts.css" %}">
+{% endblock %}
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        {{ block.super }}
+        {% if tipo_produto == 12 or tipo_produto == 16 or tipo_produto == 17 %}
+            {% if CPF_Receita == True %}
+                <div class="alert alert-warning">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> CPF IRREGULAR NA RECEITA </small><br/>
+                    </p>
+                </div>
+            {% elif status_contrato == 33 %}
+                <div class="alert alert-success">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> CONTRATO foi APROVADO por : {{ created_by }} <br>
+                            DATA da APROVAÇÃO : {{ data_modificacao }} <br>
+                            AGUARDANDO APROVAÇÃO DA PROPOSTA</small><br/>
+                    </p>
+                </div>
+            {% elif status_contrato == 19 %}
+            <div class="alert alert-warning">
+                <p>---------- ATENÇÃO ----------</p>
+                <p>
+                    <small> CONTRATO foi PENDENCIADO por : {{ created_by }} <br>
+                        DATA do PENDENCIAMENTO : {{ data_modificacao }} <br>
+                        DADOS BANCARIOS PENDENTES</small><br/>
+                </p>
+            </div>
+            {% elif status_contrato == 35 %}
+                <div class="alert alert-danger">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> SALDO DEVEDOR FOI RECUSADO <br>
+                            DATA da RECUSA {{ data_modificacao }}</small><br/>
+                    </p>
+                </div>
+            {% elif status_contrato == 28 and status_contrato < 41 or status_contrato == 30 and status_contrato < 41 or status_contrato > 31 and status_contrato < 41 %}
+                    <div class="alert alert-success">
+                        <p>---------- ATENÇÃO ----------</p>
+                        <p>
+                            <small> CONTRATO foi APROVADO por : {{ created_by }} <br>
+                                DATA da APROVAÇÃO : {{ data_modificacao }} </small><br/>
+                        </p>
+                    </div>
+            {% elif status_contrato == 24 or status_contrato == 27 or status_contrato == 31 or status_contrato == 41 %}
+                <div class="alert alert-danger">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> CONTRATO FOI RECUSADO por {{ created_by }}<br>
+                            {% if motivo %}
+                                O MOTIVO da recusa foi: {{ motivo }} <br>
+                            {% endif %}
+                            DATA de RECUSA {{ data_modificacao }}
+                        </small><br/>
+                    </p>
+                </div>
+            {% elif status_contrato == 64 %}
+                <div class="alert alert-warning">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> DADOS DO CONTRATO COM ALTERAÇÃO PENDENTE <br>
+                            {% if motivo %}
+                                O motivo da pendência foi: {{ motivo }} <br>
+                            {% endif %}
+                            Data da pendência {{ data_modificacao }}
+                        </small><br/>
+                    </p>
+                </div>
+            {% elif status_contrato == 26 or status_contrato == 51 or status_contrato == 25 %}
+                <div class="alert alert-warning">
+                    <p>---------- ATENÇÃO ----------</p>
+                    <p>
+                        <small> CONTRATO foi PENDENCIADO por: {{ created_by }}<br>
+                            {% if motivo %}
+                                O MOTIVO de PENDENCIAMENTO foi : {{ motivo }}
+                            {% endif %}
+                            <p>A DATA de PENDENCIMENTO {{ data_modificacao }}</p>
+                        </small><br/>
+                    </p>
+                </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% endif %}

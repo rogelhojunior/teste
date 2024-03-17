@@ -1,0 +1,1491 @@
+{% extends "admin/contract/contrato/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block object-tools %}
+    {% if change %}{% if not is_popup %}
+        <style>
+            .btn {
+                background-color: var(--admin-interface-module-background-color);
+                border: none;
+                color: var(--admin-interface-module-text-color);
+                cursor: pointer;
+                font-size: 12px;
+                padding: 0.2rem 14px;
+                text-align: center;
+                font-weight: normal;
+            }
+
+            .btn:hover {
+                filter: brightness(0.95);
+            }
+
+            .btn:active {
+                filter: brightness(0.9);
+            }
+
+            /* Estilizando o botão de abertura do modal */
+            .modalBtn {
+                text-decoration: none;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+
+            .modalActionBtn {
+                border-radius: 4px;
+                padding: 8px 16px;
+            }
+
+            .btnSuccess {
+                background-color: #44B78B !important;
+            }
+
+            .btnWarning {
+                background-color: #EFB80B !important;
+            }
+
+            .btnDanger {
+                background-color: #DD4646 !important;
+            }
+
+            .checkboxWrapper {
+                display: flex;
+                align-items: center;
+            }
+
+            .checkboxWrapper input {
+                margin: 1px 4px 0 0;
+            }
+
+            /* Estilizando o modal */
+            .modalBackdrop {
+                display: none; /* Ocultando o modal inicialmente */
+                position: fixed; /* Posicionando o modal como fixo */
+                z-index: 99999; /* Definindo uma ordem de empilhamento maior que a do conteúdo normal */
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4); /* Definindo uma cor de fundo escura e translúcida */
+                align-items: flex-start;
+                justify-content: center;
+                padding-top: 10%;
+            }
+
+            /* Estilizando o conteúdo do modal */
+            .modal {
+                width: 550px;
+                max-width: 90%;
+                border-radius: 10px; /* Adicionando borda arredondada */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Adicionando sombra */
+                overflow: auto;
+            }
+
+            .modal .modalHeader {
+                background-color: var(--admin-interface-module-background-color);
+                padding: 12px 24px;
+                color: var(--admin-interface-module-text-color);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .modal .modalHeader .modalTitle {
+                margin: 0;
+            }
+
+            /* Estilizando o botão de fechamento do modal */
+            .modal .modalHeader .modalCloseBtn {
+                font-size: 28px;
+                font-weight: bold;
+                color: var(--admin-interface-module-text-color);
+                background-color: transparent;
+                border-radius: 10px;
+                border: none;
+                height: 30px;
+                width: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Estilizando o botão de fechamento do modal ao passar o mouse por cima */
+            .modal .modalHeader .modalCloseBtn:hover,
+            .modal .modalHeader .modalCloseBtn:focus {
+                cursor: pointer;
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .modal .modalContent {
+                background-color: #fefefe;
+                padding: 20px;
+            }
+
+            .modal .modalContent .modalText {
+                margin: 0;
+                font-weight: normal;
+            }
+
+            .modal .modalContent form textarea {
+                width: 100%;
+                margin-top: 10px;
+                box-sizing: border-box;
+                resize: vertical;
+                min-height: 60px;
+            }
+
+            .modal .modalFooter {
+                display: flex;
+                justify-content: end;
+                gap: 8px;
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }
+        </style>
+
+        <ul class="object-tools">
+            {% if  tipo_produto == 3 or tipo_produto == 7 or tipo_produto == 15 %}
+                {% if contrato_digitacao_manual %}
+                    {% if anexo_inserido_protocolo %}
+                        {% if status_contrato == 47 %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Atenção: Ao aprovar este contrato, você estará
+                                                confirmando que a reserva da margem foi realizada pelo canal da
+                                                averbadora. Deseja continuar com a aprovação deste contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa-revisao/revisar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elif status_contrato == 8 or status_contrato == 23 %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Deseja mesmo aprovar este contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elif status_contrato == 45 and revisa_analise_manual %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Tem certeza que deseja aprovar o contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elif habilitar_botao_aprovar and status_contrato == 61 or status_contrato == 69  %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Deseja mesmo aprovar este contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="objectaction-item">
+                                <a href=""
+                                   title="Aprovar contrato" class=""
+                                   style="background-color: #aaaaaa; pointer-events: none;">
+                                    APROVAR CONTRATO
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        {% if habilitar_botao_aprovar and status_contrato == 61 or status_contrato == 69  %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Deseja mesmo aprovar este contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elif status_contrato == 8 or status_contrato == 23 %}
+                            <li class="objectaction-item modalBox">
+                                <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                    APROVAR CONTRATO
+                                </a>
+                                <div class="modalBackdrop">
+                                    <div class="modal">
+                                        <div class="modalHeader">
+                                            <h2 class="modalTitle">ATENÇÃO</h2>
+                                            <button class="modalCloseBtn">&times;</button>
+                                        </div>
+
+                                        <div class="modalContent">
+                                            <h2 class="modalText">Deseja mesmo aprovar este contrato?</h2>
+
+                                            <form method="post"
+                                                  action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                                {% csrf_token %}
+
+                                                <div class="modalFooter">
+                                                    <button type="button"
+                                                            class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                        NÃO
+                                                    </button>
+                                                    <button type="submit"
+                                                            class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                        SIM
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="objectaction-item">
+                                <a href=""
+                                   title="Aprovar contrato" class=""
+                                   style="background-color: #aaaaaa; pointer-events: none;">
+                                    APROVAR CONTRATO
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    {% if status_contrato == 1 or status_contrato == 5 %}
+                        <li class="objectaction-item">
+                            <a href=""
+                               title="Aprovar contrato" class=""
+                               style="background-color: #aaaaaa; pointer-events: none;">
+                                APROVAR CONTRATO
+                            </a>
+                        </li>
+                    {% elif habilitar_botao_aprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                APROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja aprovar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                    NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                    SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                {% if status_contrato == 11 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Pendenciar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO ESTÁ PENDENCIADO
+                        </a>
+                    </li>
+                {% elif status_contrato == 6 or status_contrato == 9 or status_contrato == 12 or status_contrato == 13 or status_contrato == 15 or status_contrato == 16 or status_contrato == 17 or status_contrato == 18 or status_contrato == 40 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class="" style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO JÁ FOI APROVADO
+                        </a>
+                    </li>
+                {% elif status_contrato == 7 or status_contrato == 10 or status_contrato == 14  or status_contrato == 63 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Reprovar contrato" class="" style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO ESTÁ REPROVADO
+                        </a>
+                    </li>
+                {% elif habilitar_botao_pendenciar %}
+                    {% if status_contrato == 61 or status_contrato == 69 %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnWarning" title="Pendenciar contrato">
+                                PENDENCIAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">Realizar Pendenciamento</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <form method="post"
+                                            action="/mesa/pendenciar-averbacao/?id_contrato={{ object_id }}" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div>
+                                                <input type="radio" id="pendente_senha"
+                                                    name="pendente"
+                                                    value="senha" required/>
+                                                <label for="pendente_senha">Senha de averbação</label><br>
+
+                                                <input type="radio" id="pendente_contracheque"
+                                                    name="pendente"
+                                                    value="contracheque"/>
+                                                <label for="pendente_contracheque">Contracheque</label><br>
+
+                                                <input type="radio" id="pendente_adicional"
+                                                    name="pendente"
+                                                    value="adicional"/>
+                                                <label for="pendente_adicional">Demais Anexos de Averbação</label><br>
+                                            </div>
+                                            <textarea maxlength="49" name="motivo_pendencia"
+                                                    rows="3" id="reasonField" class="rounded-input"
+                                                    placeholder="Digite o motivo do pendenciamento aqui"
+                                                    required></textarea>
+
+                                            <div class="form-group">
+                                                <small class="form-text text-muted">Selecione um arquivo para anexar.</small><br>
+                                                <label for="anexo">Anexo:</label>
+                                                <input type="file" id="anexo" name="anexo" accept=".pdf, .doc, .docx, .jpg, .jpeg, .png" required>
+
+                                            </div>
+
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                    Salvar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnWarning" title="Pendenciar contrato">
+                                PENDENCIAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">Realizar Pendenciamento</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <form method="post"
+                                            action="/mesa/pendenciar-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            {% if enviado_documento_pessoal %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_documento"
+                                                        name="pendente_documento"
+                                                        value="True"/>Pendenciar Documento Pessoal<br>
+                                                </label>
+                                            {% endif %}
+                                            {% if enviado_comprovante_residencia %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_endereco"
+                                                        name="pendente_endereco"
+                                                        value="True"/>Pendenciar Endereço<br>
+                                                </label>
+                                            {% endif %}
+                                            {% if selfie_enviada %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_selfie" name="pendente_selfie"
+                                                        value="True"/>Pendenciar Selfie<br>
+                                                </label>
+                                            {% endif %}
+                                            {% if contracheque_enviado %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_contracheque"
+                                                        name="pendente_contracheque"
+                                                        value="True"/>Pendenciar Contracheque<br>
+                                                </label>
+                                            {% endif %}
+                                            {% if adicional_enviado %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_adicional"
+                                                        name="pendente_adicional"
+                                                        value="True"/>Pendenciar Documento Adicional<br>
+                                                </label>
+                                            {% endif %}
+                                            <textarea maxlength="49" name="motivo_pendencia"
+                                                    rows="3" id="reasonField" class="rounded-input"
+                                                    placeholder="Digite o motivo do pendenciamento aqui"
+                                                    required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                    Salvar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                {% if status_contrato == 7 or status_contrato == 10 or status_contrato == 14 or status_contrato == 18 or status_contrato == 6 or status_contrato == 9 or status_contrato == 13 or status_contrato == 15  or status_contrato == 17 %}
+                    <li class="objectaction-item"></li>
+                {% elif habilitar_botao_reprovar %}
+                    <li class="objectaction-item modalBox">
+                        <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                            REPROVAR CONTRATO
+                        </a>
+                        <div class="modalBackdrop">
+                            <div class="modal">
+                                <div class="modalHeader">
+                                    <h2 class="modalTitle">ATENÇÃO</h2>
+                                    <button class="modalCloseBtn">&times;</button>
+                                </div>
+
+                                <div class="modalContent">
+                                    <h2 class="modalText">Tem certeza que deseja reprovar o contrato?</h2>
+
+                                    <form method="post"
+                                          action="/mesa/reprovar-contrato/?id_contrato={{ object_id }}">
+                                        {% csrf_token %}
+                                        <textarea maxlength="49" name="motivo_recusa"
+                                                  rows="3" id="reasonField" class="rounded-input"
+                                                  placeholder="Digite o motivo aqui"
+                                                  required></textarea>
+
+                                        <div class="modalFooter">
+                                            <button type="button"
+                                                    class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+
+                {% if status_contrato != 11 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Validar contrato" class="" style="background-color: #aaaaaa; pointer-events: none;">
+                            VALIDAR DOCUMENTOS
+                        </a>
+                    </li>
+                {% elif status_contrato == 11 %}
+                    <li class="objectaction-item">
+                        <a href="/mesa/validar-contrato/?id_contrato={{ object_id }}"
+                           title="Validar documentos" style="background-color: dodgerblue">VALIDAR DOCUMENTOS</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+
+            {% if tipo_produto == 12 or tipo_produto == 16 or tipo_produto == 17 %}
+                {% if CPF_Receita == True %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class="" style="background-color: #aaaaaa; pointer-events: none;">
+                            CPF IRREGULAR NA RECEITA
+                        </a>
+                    </li>
+                    {% if habilitar_botao_pendenciar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnWarning" title="Pendenciar contrato">
+                                PENDENCIAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">Realizar Pendenciamento</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <form method="post"
+                                              action="/api/portabilidade/pedencia-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            {% if tipo_produto == 16 %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_rg" name="pendente_rg"
+                                                           value="True"/>Pendenciar RG<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_dt_expedicao_rg"
+                                                           name="pendente_dt_expedicao_rg"
+                                                           value="True"/>Pendenciar Data da Expedição do RG<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_dt_nascimento"
+                                                           name="pendente_dt_nascimento"
+                                                           value="True"/>Pendenciar Data de Nascimento<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_nome" name="pendente_nome"
+                                                           value="True"/>Pendenciar Nome<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_sexo" name="pendente_sexo"
+                                                           value="True"/>Pendenciar Sexo<br>
+                                                </label>
+                                            {% endif %}
+                                            <label class="checkboxWrapper">
+                                                <input type="checkbox" id="pendente_documento" name="pendente_documento"
+                                                       value="True"/>Pendenciar Documento Pessoal<br>
+                                            </label>
+                                            <label class="checkboxWrapper">
+                                                <input type="checkbox" id="pendente_selfie" name="pendente_selfie"
+                                                       value="True"/>Pendenciar Selfie<br>
+                                            </label>
+                                            <textarea maxlength="49" name="motivo_pendencia"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do pendenciamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">Cancelar
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">Salvar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if habilitar_botao_reprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                                REPROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% elif status_contrato == 44 %}
+                    {% if habilitar_botao_aprovar_proposta %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnSuccess" title="Aceitar proposta">
+                                ACEITAR PROPOSTA QITECH/CIP
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja aprovar a proposta?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/aceite-proposta-portabilidade/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Contrato já foi aprovado" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO JÁ FOI APROVADO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Pendenciar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            PENDENCIAR CONTRATO
+                        </a>
+                    </li>
+                    {% if habilitar_botao_reprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Reprovar proposta">
+                                REPROVAR PROPOSTA QITECH/CIP
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-proposta-portabilidade/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <br>
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento da proposta aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% elif status_contrato == 19 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Contrato já foi aprovado" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO JÁ FOI APROVADO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Pendenciar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            PENDENCIAR CONTRATO
+                        </a>
+                    </li>
+                    {% if habilitar_botao_reprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                                REPROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% elif status_contrato == 28 and status_contrato < 41 or status_contrato == 30 and status_contrato < 41 or status_contrato > 31 and status_contrato < 41 and status_contrato != 32 or status_contrato == 58 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO JÁ FOI APROVADO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Pendenciar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            PENDENCIAR CONTRATO
+                        </a>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Reprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            REPROVAR CONTRATO
+                        </a>
+                    </li>
+                {% elif status_contrato == 24 or status_contrato == 27 or status_contrato == 31 or status_contrato == 35 or status_contrato == 41 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            APROVAR CONTRATO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Pendenciar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            PENDENCIAR CONTRATO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Contrato está reprovado" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO ESTÁ REPROVADO
+                        </a>
+                    </li>
+                {% elif status_contrato == 26 or status_contrato == 62 or status_contrato == 11%}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            APROVAR CONTRATO
+                        </a>
+                    </li>
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Contrato está pendenciado" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO ESTÁ PENDENCIADO
+                        </a>
+                    </li>
+                    <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                                REPROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id_contrato" value="{{ object_id }}">
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                {% elif status_contrato == 13 or status_contrato == 32 %}
+                    {% if habilitar_botao_reprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                                REPROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id_contrato" value="{{ object_id }}">
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    {% if habilitar_botao_aprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                                APROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja aprovar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/aprova-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+
+
+                    {% if habilitar_botao_pendenciar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnWarning" title="Pendenciar contrato">
+                                PENDENCIAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">Realizar Pendenciamento</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <form method="post"
+                                              action="/api/portabilidade/pedencia-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            {% if tipo_produto == 16 %}
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_rg" name="pendente_rg"
+                                                           value="True"/>Pendenciar RG<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_dt_expedicao_rg"
+                                                           name="pendente_dt_expedicao_rg"
+                                                           value="True"/>Pendenciar Data da Expedição do RG<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_dt_nascimento"
+                                                           name="pendente_dt_nascimento"
+                                                           value="True"/>Pendenciar Data de Nascimento<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_nome" name="pendente_nome"
+                                                           value="True"/>Pendenciar Nome<br>
+                                                </label>
+                                                <label class="checkboxWrapper">
+                                                    <input type="checkbox" id="pendente_sexo" name="pendente_sexo"
+                                                           value="True"/>Pendenciar Sexo<br>
+                                                </label>
+                                            {% endif %}
+                                            <label class="checkboxWrapper">
+                                                <input type="checkbox" id="pendente_documento"
+                                                       name="pendente_documento"
+                                                       value="True"/>Pendenciar Documento Pessoal<br>
+                                            </label>
+                                            <label class="checkboxWrapper">
+                                                <input type="checkbox" id="pendente_selfie" name="pendente_selfie"
+                                                       value="True"/>Pendenciar Selfie<br>
+                                            </label>
+                                            <textarea maxlength="49" name="motivo_pendencia"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do pendenciamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">Cancelar
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">Salvar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+
+                    {% if habilitar_botao_atualizar_dados_pendentes %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnWarning" title="Atualizar Dados Pendentes">
+                                ATUALIZAR DADOS PENDENTES
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">Atualizar dados pendentes</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <style>
+                                        .form-group {
+                                            margin-bottom: 15px;
+                                        }
+
+                                        .form-control {
+                                            width: 100%;
+                                            box-sizing: border-box;
+                                        }
+
+                                        input[type="text"].form-control {
+                                            font-size: 14px;
+                                            padding: 8px;
+                                        }
+                                    </style>
+                                    <div class="modalContent">
+                                        <form method="post"
+                                              action="/api/portabilidade/atualiza-pendencia/?id_contrato={{ object_id }}&motivo={{ motivo }}">
+                                            {% csrf_token %}
+                                            {% if status_contrato == 64 %}
+                                                {% if motivo == 'Dados Bancários' %}
+                                                    <div class="form-group">
+                                                        <label for="agencia">Número da Agência:</label>
+                                                        <input type="text" id="agencia" name="agencia"
+                                                               placeholder="Digite o número da agência"
+                                                               class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="conta_numero">Número da Conta:</label>
+                                                        <input type="text" id="conta_numero" name="conta_numero"
+                                                               placeholder="Digite o número da conta"
+                                                               class="form-control">
+                                                    </div>
+                                                {% endif %}
+                                                {% if motivo == 'Número do Benefício' %}
+                                                    <div class="form-group">
+                                                        <label for="numero_beneficio">Número do Benefício:</label>
+                                                        <input type="text" id="numero_beneficio" name="numero_beneficio"
+                                                               placeholder="Digite o número do benefício completo"
+                                                               class="form-control">
+                                                    </div>
+                                                {% endif %}
+                                                {% if motivo == 'Número do Banco' %}
+                                                    <div class="form-group">
+                                                        <label for="numero_banco">Número do Banco:</label>
+                                                        <input type="text" id="numero_banco" name="numero_banco"
+                                                               placeholder="Digite o número do banco"
+                                                               class="form-control">
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">Cancelar
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">Salvar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+
+                    {% if habilitar_botao_reprovar %}
+                        <li class="objectaction-item modalBox">
+                            <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                                REPROVAR CONTRATO
+                            </a>
+                            <div class="modalBackdrop">
+                                <div class="modal">
+                                    <div class="modalHeader">
+                                        <h2 class="modalTitle">ATENÇÃO</h2>
+                                        <button class="modalCloseBtn">&times;</button>
+                                    </div>
+
+                                    <div class="modalContent">
+                                        <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                        <form method="post"
+                                              action="/api/portabilidade/recusa-contrato/?id_contrato={{ object_id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id_contrato" value="{{ object_id }}">
+                                            <textarea maxlength="49" name="motivo_recusa"
+                                                      rows="3" id="reasonField" class="rounded-input"
+                                                      placeholder="Digite o motivo do cancelamento aqui"
+                                                      required></textarea>
+
+                                            <div class="modalFooter">
+                                                <button type="button"
+                                                        class="btn modalActionBtn btnDanger modalCancelBtn">NÃO
+                                                </button>
+                                                <button type="submit"
+                                                        class="btn modalActionBtn btnSuccess modalSaveBtn">SIM
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+            {% if  tipo_produto == 14 %}
+                {% if status_contrato == 1 or status_contrato == 5 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            APROVAR CONTRATO
+                        </a>
+                    </li>
+                {% elif status_contrato == 8 or status_contrato == 23 or status_contrato == 69 %}
+                    <li class="objectaction-item modalBox">
+                        <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                            APROVAR CONTRATO
+                        </a>
+                        <div class="modalBackdrop">
+                            <div class="modal">
+                                <div class="modalHeader">
+                                    <h2 class="modalTitle">ATENÇÃO</h2>
+                                    <button class="modalCloseBtn">&times;</button>
+                                </div>
+
+                                <div class="modalContent">
+                                    <h2 class="modalText">Tem certeza que deseja aprovar o contrato?</h2>
+
+                                    <form method="post"
+                                          action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                        {% csrf_token %}
+
+                                        <div class="modalFooter">
+                                            <button type="button"
+                                                    class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                NÃO
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                SIM
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% elif habilitar_botao_aprovar and status_contrato == 61 or status_contrato == 69 %}
+                    <li class="objectaction-item modalBox">
+                        <a class="btn modalBtn btnSuccess" title="Aprovar contrato">
+                            APROVAR CONTRATO
+                        </a>
+                        <div class="modalBackdrop">
+                            <div class="modal">
+                                <div class="modalHeader">
+                                    <h2 class="modalTitle">ATENÇÃO</h2>
+                                    <button class="modalCloseBtn">&times;</button>
+                                </div>
+
+                                <div class="modalContent">
+                                    <h2 class="modalText">Tem certeza que deseja aprovar o contrato?</h2>
+
+                                    <form method="post"
+                                          action="/mesa/aprovar-contrato/?id_contrato={{ object_id }}">
+                                        {% csrf_token %}
+
+                                        <div class="modalFooter">
+                                            <button type="button"
+                                                    class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                NÃO
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                SIM
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+                {% if status_contrato == 6 or status_contrato == 9 or status_contrato == 13 or status_contrato == 18 or status_contrato == 15 or status_contrato == 17 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Aprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO JÁ FOI APROVADO
+                        </a>
+                    </li>
+                {% elif status_contrato == 7 or status_contrato == 10 or status_contrato == 14 or status_contrato == 48 %}
+                    <li class="objectaction-item">
+                        <a href=""
+                           title="Reprovar contrato" class=""
+                           style="background-color: #aaaaaa; pointer-events: none;">
+                            CONTRATO ESTÁ REPROVADO
+                        </a>
+                    </li>
+                {% endif %}
+                {% if status_contrato == 7 or status_contrato == 10 or status_contrato == 14 or status_contrato == 18 or status_contrato == 6 or status_contrato == 9 or status_contrato == 13 or status_contrato == 15  or status_contrato == 17 or status_contrato == 48 %}
+                    <li class="objectaction-item">
+
+                    </li>
+                {% elif status_contrato == 8 or status_contrato == 23 or status_contrato == 5 %}
+                    <li class="objectaction-item modalBox">
+                        <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                            REPROVAR CONTRATO
+                        </a>
+                        <div class="modalBackdrop">
+                            <div class="modal">
+                                <div class="modalHeader">
+                                    <h2 class="modalTitle">ATENÇÃO</h2>
+                                    <button class="modalCloseBtn">&times;</button>
+                                </div>
+
+                                <div class="modalContent">
+                                    <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                    <form method="post"
+                                          action="/mesa/reprovar-contrato/?id_contrato={{ object_id }}">
+                                        {% csrf_token %}
+
+                                        <div class="modalFooter">
+                                            <button type="button"
+                                                    class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                NÃO
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                SIM
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% elif habilitar_botao_reprovar and status_contrato == 61 or status_contrato == 68 or status_contrato == 69 %}
+                    <li class="objectaction-item modalBox">
+                        <a class="btn modalBtn btnDanger" title="Cancelar contrato">
+                            REPROVAR CONTRATO
+                        </a>
+                        <div class="modalBackdrop">
+                            <div class="modal">
+                                <div class="modalHeader">
+                                    <h2 class="modalTitle">ATENÇÃO</h2>
+                                    <button class="modalCloseBtn">&times;</button>
+                                </div>
+
+                                <div class="modalContent">
+                                    <h2 class="modalText">Tem certeza que deseja cancelar o contrato?</h2>
+
+                                    <form method="post"
+                                          action="/mesa/reprovar-contrato/?id_contrato={{ object_id }}">
+                                        {% csrf_token %}
+
+                                        <div class="modalFooter">
+                                            <button type="button"
+                                                    class="btn modalActionBtn btnDanger modalCancelBtn">
+                                                NÃO
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn modalActionBtn btnSuccess modalSaveBtn">
+                                                SIM
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endif %}
+
+            {% block object-tools-items %}
+                {% change_form_object_tools %}
+            {% endblock %}
+        </ul>
+
+        <script>
+            const modals = Array.from(document.getElementsByClassName("modalBox"));
+
+
+            modals.forEach((modalBox) => {
+                const modal = modalBox.querySelectorAll(".modalBackdrop")[0];
+                const modalBtn = modalBox.querySelectorAll(".modalBtn")[0];
+                const cancelarBtn = modalBox.querySelectorAll(".modalCancelBtn")[0];
+                const closeBtn = modalBox.querySelectorAll(".modalCloseBtn")[0];
+                const saveBtn = modalBox.querySelectorAll(".modalSaveBtn")[0];
+                const form = modalBox.querySelectorAll("form")[0];
+
+                const closeFromEsc = (event) => {
+                    if (event.keyCode === 27) { // 27 | ESC
+                        hideModal();
+                    }
+                }
+
+                const showModal = () => {
+                    modal.style.display = "flex";
+                    document.addEventListener("keydown", closeFromEsc);
+                };
+
+                const hideModal = () => {
+                    modal.style.display = "none";
+                    document.removeEventListener("keydown", closeFromEsc);
+                };
+
+                modalBtn.onclick = showModal;
+                cancelarBtn.onclick = hideModal;
+                closeBtn.onclick = hideModal;
+                document.addEventListener("DOMContentLoaded", function () {
+                    var btnBackOffice = document.getElementById("btnBackOffice");
+
+                    btnBackOffice.addEventListener("click", function () {
+                        btnBackOffice.disabled = true;
+                    });
+                });
+
+                form.addEventListener('submit', (event) => {
+                    saveBtn.disabled = true;
+                });
+
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        hideModal();
+                    }
+                })
+            })
+        </script>
+        <script>
+            function uncheckOther(checkbox) {
+                var checkboxes = document.querySelectorAll('input[type="radio"]');
+                checkboxes.forEach(function(cb) {
+                    if (cb !== checkbox) {
+                        cb.checked = false;
+                    }
+                });
+            }
+        </script>
+    {% endif %}{% endif %}
+
+{% endblock %}
+
+<div>
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+    {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+    {% if errors %}
+        <p class="errornote">
+            {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}
+                {% translate "Please correct the errors below." %}{% endif %}
+        </p>
+        {{ adminform.form.non_field_errors }}
+    {% endif %}
+
+</div>

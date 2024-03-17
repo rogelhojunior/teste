@@ -1,0 +1,7 @@
+Dockerfile
+DockerComposefile
+README.md
+dev-requirements.txt
+docker-compose.yml
+pyproject.toml
+venv
