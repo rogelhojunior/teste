@@ -710,7 +710,7 @@ def gerar_hash_assinatura(ip, cpf, latitude, longitude, data=None):
     # Para garantir a integridade dos dados, existe a opção de utilizar a mesma
     # data que será armazenada no banco de dados durante a geração do hash.
 
-    now = data if data else datetime.now()
+    now = data or datetime.now()
     data_atual = now.strftime('%Y-%m-%d %H:%M:%S')
     dados_cliente_hash = (
         str(ip) + str(cpf) + str(data_atual) + str(latitude) + str(longitude)

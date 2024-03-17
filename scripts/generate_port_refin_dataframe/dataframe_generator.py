@@ -188,9 +188,7 @@ class DataFrameGenerator:
             'conta_digito',
         ]
 
-        columns_to_add = pd.Series(values_to_insert, index=names)
-
-        return columns_to_add
+        return pd.Series(values_to_insert, index=names)
 
     def add_in100_tipo_beneficio(self):
         def get_in100_tipo_beneficio(id: int) -> int:

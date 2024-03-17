@@ -42,8 +42,7 @@ def generate_file_name():
     suffix = datetime.now().strftime('%x-%X')
     suffix = suffix.replace('/', '-')
     suffix = suffix.replace(':', '-')
-    file_name = f'{DEFAULT_FILE_NAME}_{suffix}.xlsx'
-    return file_name
+    return f'{DEFAULT_FILE_NAME}_{suffix}.xlsx'
 
 
 def validate_path(file_path: str):
@@ -74,10 +73,9 @@ def get_contracts():
     """
     Query contracts.
     """
-    queryset = Contrato.objects.filter(
+    return Contrato.objects.filter(
         tipo_produto=EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO
     )
-    return queryset
 
 
 def calculate_endorsed_dataprev(operation_key):
