@@ -3077,8 +3077,8 @@ class AvailableOffersAPIView(GenericAPIView):
         self,
         margem_rcc: int,
         margem_rmc: int = 0,
-        has_rcc_product: bool,
-        has_rmc_product: bool,
+        has_rcc_product: bool = False,
+        has_rmc_product: bool = False,
     ):
         if margem_rcc and margem_rcc >= margem_rmc and has_rcc_product:
             return {
