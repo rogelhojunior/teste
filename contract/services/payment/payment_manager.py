@@ -89,7 +89,7 @@ class PaymentManager:
         return BanksoftAdapter.commissioning(self.contract)
 
     def update_bank_details(self, account, client, proposal_number=None):
-        contrato_saque = self.benefit_card if self.benefit_card else self.contrato_saque
+        contrato_saque = self.benefit_card or self.contrato_saque
         if self.payment_provider == 'DIGIMAIS':
             alterar_status(
                 self.contract,

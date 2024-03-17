@@ -157,9 +157,8 @@ class AcaoCorban(GenericAPIView):
 
             next_status = ContractStatus.CHECAGEM_MESA_FORMALIZACAO
 
-            if self.is_card_product(contract):
-                if self.should_check_dataprev(contract, product):
-                    next_status = ContractStatus.ANDAMENTO_CHECAGEM_DATAPREV
+            if self.is_card_product(contract) and self.should_check_dataprev(contract, product):
+                next_status = ContractStatus.ANDAMENTO_CHECAGEM_DATAPREV
 
             statuses = [
                 StatusContrato(contrato=contract, nome=status, created_by=user)

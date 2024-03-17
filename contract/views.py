@@ -1716,9 +1716,7 @@ def link_formalizacao_envelope(token_envelope, user):
         if cliente and cliente.escolaridade == EnumEscolaridade.ANALFABETO:
             contrato.url_formalizacao_rogado = (
                 contrato.url_formalizacao_rogado
-                or generate_short_url(
-                    long_url=f'{url_formalizacao_longa}/rogado'
-                )
+                or generate_short_url(long_url=f'{url_formalizacao_longa}/rogado')
             )
 
         contrato.save(

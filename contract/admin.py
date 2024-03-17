@@ -966,7 +966,9 @@ def contrato_resource_export(isFront):
 
         def dehydrate_restricoes(self, contrato):
             restricoes = contrato.contrato_validacoes.all().filter(checked=False)
-            restricoes_list = [restricao.mensagem_observacao for restricao in restricoes]
+            restricoes_list = [
+                restricao.mensagem_observacao for restricao in restricoes
+            ]
             return ''.join(restricoes_list)
 
         def dehydrate_regras_validadas(self, contrato):
