@@ -3781,55 +3781,56 @@ class ContratoAdmin(ImportExportModelAdmin):
 
     def reprovar_em_lote(self, request, queryset):
         """Action Temporário"""
-        if ENVIRONMENT == 'PROD':
-            ids_contrato = []
-            for id_contrato in ids_contrato:
-                try:
-                    contrato = Contrato.objects.filter(id=id_contrato).first()
-                    if (
-                        contrato.tipo_produto
-                        == EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO
+        if ENVIRONMENT != 'PROD':
+            return
+
+        ids_contrato = []
+        for id_contrato in ids_contrato:
+            try:
+                contrato = Contrato.objects.filter(id=id_contrato).first()
+                if (
+                    contrato.tipo_produto
+                    == EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO
+                ):
+                    portabilidade = Portabilidade.objects.get(contrato=contrato)
+                    refinanciamento = Refinanciamento.objects.get(contrato=contrato)
+                    if refuse_product_proposal_qitech(
+                        contract=contrato,
+                        product=portabilidade,
                     ):
-                        portabilidade = Portabilidade.objects.get(contrato=contrato)
-                        refinanciamento = Refinanciamento.objects.get(contrato=contrato)
-                        if refuse_product_proposal_qitech(
-                            contract=contrato,
-                            product=portabilidade,
-                        ):
-                            contrato.status = EnumContratoStatus.CANCELADO
-                            contrato.save()
-                            StatusContrato.objects.create(
-                                contrato=contrato,
-                                nome=ContractStatus.REPROVADO.value,
-                                descricao_mesa='Retido',
-                                descricao_front='Retenção do Cliente',
-                            )
-                            portabilidade.status = ContractStatus.REPROVADO.value
-                            portabilidade.save()
-                            refinanciamento.status = ContractStatus.REPROVADO.value
-                            refinanciamento.save()
-                            if request:
-                                messages.success(
-                                    request, f'Contrato {contrato.id} - REPROVADO.'
-                                )
-                        else:
-                            if request:
-                                messages.error(
-                                    request,
-                                    'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
-                                )
-                    else:
-                        messages.error(
-                            request, f'O contrato não é de PORT+REFIN({contrato.id})'
+                        contrato.status = EnumContratoStatus.CANCELADO
+                        contrato.save()
+                        StatusContrato.objects.create(
+                            contrato=contrato,
+                            nome=ContractStatus.REPROVADO.value,
+                            descricao_mesa='Retido',
+                            descricao_front='Retenção do Cliente',
                         )
-                except Exception as e:
+                        portabilidade.status = ContractStatus.REPROVADO.value
+                        portabilidade.save()
+                        refinanciamento.status = ContractStatus.REPROVADO.value
+                        refinanciamento.save()
+                        if request:
+                            messages.success(
+                                request, f'Contrato {contrato.id} - REPROVADO.'
+                            )
+                    elif request:
+                        messages.error(
+                            request,
+                            'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
+                        )
+                else:
                     messages.error(
-                        request,
-                        f'Ocorreu um erro ao REPROVAR o contrato({id_contrato}): {e}',
+                        request, f'O contrato não é de PORT+REFIN({contrato.id})'
                     )
-                    logging.error(
-                        f'Ocorreu um erro ao REPROVAR o contrato({id_contrato}): {e}'
-                    )
+            except Exception as e:
+                messages.error(
+                    request,
+                    f'Ocorreu um erro ao REPROVAR o contrato({id_contrato}): {e}',
+                )
+                logging.error(
+                    f'Ocorreu um erro ao REPROVAR o contrato({id_contrato}): {e}'
+                )
 
     def recalcular_contrato(self, request, queryset):
         from contract.products.portabilidade.tasks import (

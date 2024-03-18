@@ -157,9 +157,10 @@ class AcaoCorban(GenericAPIView):
 
             next_status = ContractStatus.CHECAGEM_MESA_FORMALIZACAO
 
-            if self.is_card_product(contract):
-                if self.should_check_dataprev(contract, product):
-                    next_status = ContractStatus.ANDAMENTO_CHECAGEM_DATAPREV
+            if self.is_card_product(contract) and self.should_check_dataprev(
+                contract, product
+            ):
+                next_status = ContractStatus.ANDAMENTO_CHECAGEM_DATAPREV
 
             statuses = [
                 StatusContrato(contrato=contract, nome=status, created_by=user)
@@ -656,12 +657,11 @@ def refuse_contract(contrato, observacao, request=None):
                     messages.success(
                         request, f'Contrato {contrato.id} - {cliente} REPROVADO.'
                     )
-            else:
-                if request:
-                    messages.error(
-                        request,
-                        'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
-                    )
+            elif request:
+                messages.error(
+                    request,
+                    'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
+                )
         elif contrato.tipo_produto == EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO:
             portabilidade = Portabilidade.objects.get(contrato=contrato)
             refinanciamento = Refinanciamento.objects.get(contrato=contrato)
@@ -689,12 +689,11 @@ def refuse_contract(contrato, observacao, request=None):
                         request, f'Contrato {contrato.id} - {cliente} REPROVADO.'
                     )
 
-            else:
-                if request:
-                    messages.error(
-                        request,
-                        'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
-                    )
+            elif request:
+                messages.error(
+                    request,
+                    'Ocorreu um erro na chamada da API \n Valide na aba Portabilidade(RESPOSTAS APIS QITECH)',
+                )
         elif contrato.tipo_produto == EnumTipoProduto.MARGEM_LIVRE:
             margem_livre = MargemLivre.objects.get(contrato=contrato)
             if (
@@ -831,12 +830,9 @@ def update_issue_button(request: WSGIRequest):
         refinancing: Refinanciamento = contract.contrato_refinanciamento.filter(
             contrato=contract
         ).first()
-        free_margin: MargemLivre = contract.contrato_margem_livre.filter(
+        if free_margin := contract.contrato_margem_livre.filter(
             contrato=contract
-        ).first()
-
-        # Se o status original for igual ao atual
-        if free_margin:
+        ).first():
             EndorsementCorrection(
                 product=free_margin,
                 type_correction=pendency_reason,
@@ -1225,20 +1221,19 @@ def aceita_proposta_automatica_qitech_cip(contrato):
                 ContractStatus.REPROVADO.value,
                 observacao=validacao_beneficio['motivo'],
             )
+        elif AcceptProposalFinancialPortability(contract=contrato).execute():
+            portabilidade.status = ContractStatus.INT_CONFIRMA_PAGAMENTO.value
+            StatusContrato.objects.create(
+                contrato=contrato,
+                nome=ContractStatus.INT_CONFIRMA_PAGAMENTO.value,
+                descricao_mesa='Proposta aceita',
+            )
+            portabilidade.status_ccb = EnumStatusCCB.ACCEPTED.value
+            portabilidade.save()
         else:
-            if AcceptProposalFinancialPortability(contract=contrato).execute():
-                portabilidade.status = ContractStatus.INT_CONFIRMA_PAGAMENTO.value
-                StatusContrato.objects.create(
-                    contrato=contrato,
-                    nome=ContractStatus.INT_CONFIRMA_PAGAMENTO.value,
-                    descricao_mesa='Proposta aceita',
-                )
-                portabilidade.status_ccb = EnumStatusCCB.ACCEPTED.value
-                portabilidade.save()
-            else:
-                ultimo_status = StatusContrato.objects.filter(contrato=contrato).last()
-                ultimo_status.descricao_mesa = portabilidade.motivo_aceite_proposta
-                ultimo_status.save(update_fields=['descricao_mesa'])
+            ultimo_status = StatusContrato.objects.filter(contrato=contrato).last()
+            ultimo_status.descricao_mesa = portabilidade.motivo_aceite_proposta
+            ultimo_status.save(update_fields=['descricao_mesa'])
     except Exception as e:
         logging.error(f'Ocorreu um erro ao ACEITAR a proposta: {e}')
 

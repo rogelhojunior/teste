@@ -217,9 +217,9 @@ class BuscarCEP(APIView):
             )
 
         try:
-            address = self.get_address_from_cep(cep, webservice='VIACEP')
-            if not address:
-                address = self.get_address_from_cep(cep, webservice='APICEP')
+            address = self.get_address_from_cep(
+                cep, webservice='VIACEP'
+            ) or self.get_address_from_cep(cep, webservice='APICEP')
 
             if not address:
                 return Response(
@@ -1756,11 +1756,11 @@ class AtualizarCliente(UpdateAPIView):
         return dados_bancarios, updated, defaults
 
     def find_current_account_details(self, cliente, pk):
-        queryset = DadosBancarios.objects.filter(cliente=cliente).order_by(
-            '-updated_at'
+        return (
+            DadosBancarios.objects.filter(cliente=cliente)
+            .order_by('-updated_at')
+            .first()
         )
-        instancia = queryset.first()
-        return instancia
 
     def _log_changes(self, alteracoes, cliente):
         for field, values in alteracoes.items():
@@ -3076,23 +3076,21 @@ class AvailableOffersAPIView(GenericAPIView):
     def pick_best_benefit_card_offer(
         self,
         margem_rcc: int,
-        margem_rmc: int,
-        has_rcc_product: bool,
-        has_rmc_product: bool,
+        margem_rmc: int = 0,
+        has_rcc_product: bool = False,
+        has_rmc_product: bool = False,
     ):
-        if margem_rcc or margem_rmc:
-            if margem_rcc >= margem_rmc:
-                if has_rcc_product:
-                    return {
-                        'tipo_produto': EnumTipoProduto.CARTAO_BENEFICIO,
-                        'margem_atual': margem_rcc,
-                    }
+        if margem_rcc and margem_rcc >= margem_rmc and has_rcc_product:
+            return {
+                'tipo_produto': EnumTipoProduto.CARTAO_BENEFICIO,
+                'margem_atual': margem_rcc,
+            }
 
-            if margem_rmc > 0 and has_rmc_product:
-                return {
-                    'tipo_produto': EnumTipoProduto.CARTAO_CONSIGNADO,
-                    'margem_atual': margem_rmc,
-                }
+        if margem_rmc > 0 and has_rmc_product:
+            return {
+                'tipo_produto': EnumTipoProduto.CARTAO_CONSIGNADO,
+                'margem_atual': margem_rmc,
+            }
 
         return None
 
@@ -3240,8 +3238,8 @@ def import_excel_view(request):
                     cliente_convenio__cliente=cliente
                 ).first()
 
-            tipo_produto = mapeamento_tipos_produto.get(row['Tipo de Produto'], None)
-            tipo_margem = mapeamento_tipos_margem.get(row['Tipo Margem'], None)
+            tipo_produto = mapeamento_tipos_produto.get(row['Tipo de Produto'])
+            tipo_margem = mapeamento_tipos_margem.get(row['Tipo Margem'])
 
             ClienteCartaoBeneficio.objects.update_or_create(
                 cliente=cliente,

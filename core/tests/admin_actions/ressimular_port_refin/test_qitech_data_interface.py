@@ -60,7 +60,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # invalid installment_status
     def test_with_invalid_installment_status(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment['installment_status'] = 'invalid status'
@@ -69,7 +69,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing installment_status
     def test_with_missing_installment_status(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment.pop('installment_status')
@@ -78,7 +78,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # invalid installment_status_enumerator
     def test_with_invalid_installment_status_enumerator(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment['installment_status']['enumerator'] = 'invalid status'
@@ -87,7 +87,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing installment_status_enumerator
     def test_with_missing_installment_status_enumerator(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment['installment_status'].pop('enumerator')
@@ -96,7 +96,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing invalid present_amount
     def test_with_invalid_present_amount(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment['present_amount'] = 'invalid'
@@ -105,7 +105,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing present_amount
     def test_with_missing_present_amount(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment.pop('present_amount')
@@ -114,7 +114,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing invalid total_amount
     def test_with_invalid_total_amount(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment['total_amount'] = 'invalid'
@@ -123,7 +123,7 @@ class TestQiTechOperationDataInterfaceIsValid(TestCase):
 
     # missing total_amount
     def test_with_missing_total_amount(self):
-        for i in range(0, len(self.valid_data['data']['installments'])):
+        for i in range(len(self.valid_data['data']['installments'])):
             invalid_data = self.valid_data
             installment = invalid_data['data']['installments'][i]
             installment.pop('total_amount')

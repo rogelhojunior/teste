@@ -178,21 +178,13 @@ def ajustar_posicoes(destino):
     with open(destino.name, 'r') as arquivo:
         linhas = arquivo.readlines()
 
-    # Ordenar as linhas primeiro pela primeira coluna e depois pela sequência numérica
     linhas_ordenadas = sorted(linhas, key=lambda x: (int(x[0]), int(x[-5:])))
-    i_registro = 1
-    for i in range(len(linhas_ordenadas)):
+    for i_registro, i in enumerate(range(len(linhas_ordenadas)), start=1):
         linha = linhas_ordenadas[i]
         novo_dado = f'{i_registro}'.rjust(6, '0')
-        # Modifique os caracteres de 1295 a 1300 conforme necessário
-        linha_modificada = linha[:1294] + f'{novo_dado}' + linha[1300:]
 
-        # Atualize a linha na lista de linhas ordenadas
-        linhas_ordenadas[i] = linha_modificada
+        linhas_ordenadas[i] = f'{linha[:1294]}{novo_dado}{linha[1300:]}'
 
-        i_registro += 1  # Incrementar o contador
-
-    # Escrever as linhas ordenadas de volta para o arquivo
     with open(destino.name, 'w') as arquivo_ordenado:
         arquivo_ordenado.writelines(linhas_ordenadas)
 
@@ -221,7 +213,7 @@ def calcular_cf(
 ):
     td = diferenca + 1
 
-    if eh_bissexto(datetime.today().year):
+    if eh_bissexto(datetime.now().year):
         tv = calcular_dias_de_vigencia(
             inicio_vigencia,
             datetime(
@@ -251,10 +243,9 @@ def criar_nome_arquivo(operacao_sequencial):
     today = datetime.now()
     maior_sequencial = get_maior_sequencial(operacao_sequencial) or 1
     maior_sequencial_nome = f'{maior_sequencial}'.rjust(6, '0')
-    nome_arquivo = (
+    return (
         f"{operacao_sequencial}_{maior_sequencial_nome}_{today.strftime('%d%m%Y')}.txt"
     )
-    return nome_arquivo
 
 
 def criar_identificacao_nova(identificacao_seguro, nova_id_seq):

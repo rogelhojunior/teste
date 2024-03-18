@@ -118,7 +118,7 @@ class RepresentanteComercialAdmin(ImportExportModelAdmin):
                 # Se o que foi salvo é igual ao que vai ser salvo agora
                 if obj.cargo == representante.get().cargo:
                     super().save_model(request, obj, form, change)
-                    operacao = 'Criação' if not change else 'Edição'
+                    operacao = 'Edição' if change else 'Criação'
                     log = LogComercial.objects.create(
                         usuario=request.user,
                         representante_comercial=obj.nome,
@@ -176,7 +176,7 @@ class RepresentanteComercialAdmin(ImportExportModelAdmin):
                             gerente.delete()
         # Salva e gera o log
         super().save_model(request, obj, form, change)
-        operacao = 'Criação' if not change else 'Edição'
+        operacao = 'Edição' if change else 'Criação'
         log = LogComercial.objects.create(
             usuario=request.user,
             representante_comercial=obj.nome,

@@ -89,7 +89,7 @@ class IN100Serializer(serializers.ModelSerializer):
 
     def get_in100_autorizada(self, obj):
         try:
-            return obj.in100_data_autorizacao_ if obj.in100_data_autorizacao_ else False
+            return obj.in100_data_autorizacao_ or False
         except Exception as e:
             print(f'Erro ao buscar IN100: {e}')
             return {}

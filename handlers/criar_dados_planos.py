@@ -49,20 +49,14 @@ def ajustar_posicoes(destino):
     with open(destino.name, 'r') as arquivo:
         linhas = arquivo.readlines()
 
-    # Ordenar as linhas primeiro pela primeira coluna e depois pela sequência numérica
     linhas_ordenadas = sorted(linhas, key=lambda x: (int(x[0]), int(x[-5:])))
-    i_registro = 1
-    for i in range(len(linhas_ordenadas)):
+
+    for i_registro, i in enumerate(range(len(linhas_ordenadas)), start=1):
         linha = linhas_ordenadas[i]
         novo_dado = f'{i_registro}'.rjust(6, '0')
-        # Modifique os caracteres de 1295 a 1300 conforme necessário
-        linha_modificada = linha[:1294] + f'{novo_dado}' + linha[1300:]
 
-        # Atualize a linha na lista de linhas ordenadas
-        linhas_ordenadas[i] = linha_modificada
+        linhas_ordenadas[i] = f'{linha[:1294]}{novo_dado}{linha[1300:]}'
 
-        i_registro += 1  # Incrementar o contador
-    # Escrever as linhas ordenadas de volta para o arquivo
     with open(destino.name, 'w') as arquivo_ordenado:
         arquivo_ordenado.writelines(linhas_ordenadas)
 
@@ -98,15 +92,10 @@ def check_data_in_last(start_text, start_index, end_index, local_path):
         with open(local_path.name, 'r') as arquivo:
             lines = arquivo.readlines()
 
-        last_line_index = []
+        last_line_index = [
+            i for i, line in enumerate(lines) if line.startswith(start_text)
+        ]
 
-        for i, line in enumerate(lines):
-            if line.startswith(start_text):
-                last_line_index.append(
-                    i
-                )  # Atualiza o índice da última linha encontrada
-
-        extracted_text = False
         extracted_text = False
 
         if last_line_index is not None:
@@ -119,9 +108,7 @@ def check_data_in_last(start_text, start_index, end_index, local_path):
                     for index in last_line_index
                 )
             ]
-            dados = []
-            for dado_extraido in lines:
-                dados.append(dado_extraido[start_index:end_index])
+            dados = [dado_extraido[start_index:end_index] for dado_extraido in lines]
             first_date = lines[-1][0]
             last_line = max(dados, key=lambda x: int(x))
             extracted_text = last_line
@@ -513,112 +500,3 @@ def escrever_arquivo_generali(contrato, plano, cartao_beneficio, cliente_cartao)
         qtd_arrecadacao=1,
     )
     logger.info('Finalizou os dados do beneficio')
-
-
-# Funcao em desuso
-# def beneficios_planos(cliente_cartao, contrato, cartao_beneficio=None):
-#     instituicao = {
-#         'BRB': {
-#             'operacao_sequencial': 'BRBVIDAINSS',
-#             'produto': '93911',
-#             'apolice': '0000007000',
-#             'cd_operacao': '202',
-#             'plano': '1',
-#             'cnpj_empresa': '33136888000143',
-#             'id_seguro': '719320201',
-#             'vida': '423',
-#             'tp_vigencia': 'P.M',
-#         },
-#         'PINE': {
-#             'operacao_sequencial': 'BANCOPINEVIDA',
-#             'produto': '93805',
-#             'apolice': '0000006978',
-#             'cd_operacao': '178',
-#             'plano': '5',
-#             'cnpj_empresa': '62144175000120',
-#             'id_seguro': '719317805',
-#             'vida': '24',
-#             'tp_vigencia': '',
-#         },
-#         # TODO: Ajustar quando tiver funcionalidade da Digimais
-#         'DIGIMAIS': {
-#             'operacao_sequencial': 'BANCOPINEVIDA',
-#             'produto': '93805',
-#             'apolice': '0000006978',
-#             'cd_operacao': '178',
-#             'plano': '5',
-#             'cnpj_empresa': '62144175000120',
-#             'id_seguro': '719317805',
-#             'vida': '24',
-#             'tp_vigencia': '',
-#         },
-#     }
-#
-#     if (
-#         settings.ORIGIN_CLIENT == 'BRB'
-#         or settings.ORIGIN_CLIENT == 'PINE'
-#         or settings.ORIGIN_CLIENT == 'DIGIMAIS'
-#         and contrato.tipo_produto == EnumTipoProduto.CARTAO_BENEFICIO
-#     ):
-#         try:
-#             chamada = instituicao[settings.ORIGIN_CLIENT]
-#         except Exception as e:
-#             logger.error(
-#                 f'Banco não cadastrado! Verifique o ORIGIN_CLIENT (beficios_plano): {e}'
-#             )
-#             raise ValueError(
-#                 'Banco não cadastrado! Verifique o ORIGIN_CLIENT: {}'.format(
-#                     settings.ORIGIN_CLIENT
-#                 )
-#             )
-#
-#         operacao_sequencial = chamada['operacao_sequencial']
-#
-#         cartao_beneficio = CartaoBeneficio.objects.filter(contrato=contrato).first()
-#
-#         if not cartao_beneficio:
-#             cartao_beneficio = contrato.cliente_cartao_contrato.get()
-#
-#         convenio = (
-#             Convenios.objects.filter(pk=cartao_beneficio.convenio.pk).first()
-#             if cartao_beneficio
-#             else None
-#         )
-#
-#         if convenio and convenio.convenio_inss:
-#             uuid = generate_uuid()
-#             if BeneficiosContratado.objects.filter(
-#                 identificacao_segurado=uuid
-#             ).exists():
-#                 uuid = generate_uuid()
-#
-#             data_venda = datetime.strftime(contrato.criado_em, '%Y%m%d')
-#             data_venda_ajuste = datetime.strptime(data_venda, '%Y%m%d')
-#             data_venda_ajuste += relativedelta(years=1)
-#             data_fim_vigencia = data_venda_ajuste.strftime('%Y%m%d')
-#
-#             id_seq = f'{contrato.id}'
-#             nova_id_seq = id_seq.rjust(11, '0')
-#
-#             try:
-#                 BeneficiosContratado.objects.create(
-#                     id_conta_dock=cliente_cartao.id_conta_dock or '',
-#                     id_cartao_dock=cliente_cartao.id_registro_dock or '',
-#                     contrato_emprestimo=contrato,
-#                     id_plano=chamada['plano'],
-#                     nome_operadora='Generali',
-#                     nome_plano=operacao_sequencial,
-#                     obrigatorio=True,
-#                     identificacao_segurado=chamada['id_seguro'] + nova_id_seq,
-#                     valor_plano='200.000,00',
-#                     premio='425,00',
-#                     validade=data_fim_vigencia,
-#                     renovacao_automatica=True,
-#                     cliente=get_object_or_404(Cliente, id=contrato.cliente.id),
-#                 )
-#             except Exception as e:
-#                 logger.error(
-#                     f'Erro ao cadastrar BeneficiosContratado (beficios_plano): {e}'
-#                 )
-#
-#             return 'Ok'

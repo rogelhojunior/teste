@@ -107,7 +107,7 @@ class DataFrameGenerator:
 
         # adding thread
         number_of_rows = self.df.shape[0]
-        for i in range(0, number_of_rows):
+        for i in range(number_of_rows):
             base_value = self.df.loc[i, base_column_name]
             thread_id = self.pool_executor.add_thread(function, base_value)
 
@@ -188,9 +188,7 @@ class DataFrameGenerator:
             'conta_digito',
         ]
 
-        columns_to_add = pd.Series(values_to_insert, index=names)
-
-        return columns_to_add
+        return pd.Series(values_to_insert, index=names)
 
     def add_in100_tipo_beneficio(self):
         def get_in100_tipo_beneficio(id: int) -> int:

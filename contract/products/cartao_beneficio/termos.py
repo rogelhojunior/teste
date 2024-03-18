@@ -587,20 +587,10 @@ def get_dados_contrato(contrato, contrato_cartao):
                 cnpj_pagador,
                 endereco_pagador,
             )
-
-    elif contrato.seguro:
-        if settings.ORIGIN_CLIENT == 'DIGIMAIS':
-            term_adhesion_digimais(data=dados_termo)
-
-        else:
-            termo_adesao_amigoz(dados_termo)
-
+    elif settings.ORIGIN_CLIENT == 'DIGIMAIS':
+        term_adhesion_digimais(data=dados_termo)
     else:
-        if settings.ORIGIN_CLIENT == 'DIGIMAIS':
-            term_adhesion_digimais(data=dados_termo)
-
-        else:
-            termo_adesao_amigoz(dados_termo)
+        termo_adesao_amigoz(dados_termo)
 
     regulamento_cartao(
         nome_titular,

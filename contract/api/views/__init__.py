@@ -470,31 +470,29 @@ class EnvioLinkFormalizacaoAPIView(GenericAPIView):
                             'url_formalizacao_curta': '',
                             'motivo_url_indisponivel': f'{status.descricao_mesa}',
                         }
+                    elif (
+                        contrato.cliente
+                        and contrato.cliente.escolaridade == EnumEscolaridade.ANALFABETO
+                    ):
+                        payload = {
+                            **api_contrato.LinkFormalizacaoAnalfabetoSerializer(
+                                instance=contrato
+                            ).data,
+                            'anexos': [
+                                {
+                                    anexo.nome_anexo: anexo.get_attachment_url,
+                                }
+                                for anexo in AnexoContrato.objects.filter(
+                                    contrato__token_envelope=token_envelope,
+                                    tipo_anexo=EnumTipoAnexo.TERMOS_E_ASSINATURAS,
+                                )
+                                if 'assinado' not in anexo.nome_anexo
+                            ],
+                        }
                     else:
-                        if (
-                            contrato.cliente
-                            and contrato.cliente.escolaridade
-                            == EnumEscolaridade.ANALFABETO
-                        ):
-                            payload = {
-                                **api_contrato.LinkFormalizacaoAnalfabetoSerializer(
-                                    instance=contrato
-                                ).data,
-                                'anexos': [
-                                    {
-                                        anexo.nome_anexo: anexo.get_attachment_url,
-                                    }
-                                    for anexo in AnexoContrato.objects.filter(
-                                        contrato__token_envelope=token_envelope,
-                                        tipo_anexo=EnumTipoAnexo.TERMOS_E_ASSINATURAS,
-                                    )
-                                    if 'assinado' not in anexo.nome_anexo
-                                ],
-                            }
-                        else:
-                            payload = {
-                                'url_formalizacao_curta': f'{url_formalizacao_curta}',
-                            }
+                        payload = {
+                            'url_formalizacao_curta': f'{url_formalizacao_curta}',
+                        }
 
                 else:
                     payload = {
@@ -1535,12 +1533,10 @@ class RegularizarPendenciaAverbacao(GenericAPIView):
                     status=HTTP_400_BAD_REQUEST,
                 )
 
-            arquivo = req_serializer.validated_data.get('arquivo_regularizacao')
-            if arquivo:
+            if arquivo := req_serializer.validated_data.get('arquivo_regularizacao'):
                 regularizacao_contrato.arquivo_regularizacao = arquivo
 
-            mensagem = req_serializer.validated_data.get('mensagem_regularizacao')
-            if mensagem:
+            if mensagem := req_serializer.validated_data.get('mensagem_regularizacao'):
                 regularizacao_contrato.mensagem_regularizacao = mensagem
 
             regularizacao_contrato.data_regularizacao = datetime.now()

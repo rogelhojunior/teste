@@ -33,7 +33,7 @@ class TestResimularPortRefinAction(TestCase):
         )
 
         self.total_contratos = 10
-        for i in range(0, self.total_contratos):
+        for i in range(self.total_contratos):
             contrato = Contrato.objects.create(
                 cliente=cliente,
                 tipo_produto=EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO,

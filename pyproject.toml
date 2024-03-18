@@ -30,9 +30,9 @@ exclude = [
     "venv",
 ]
 
-ignore = ["D101", "D100", "D102", "D103", "D105", "D106", "D203", "E203", "E501", "C901"]
+lint.ignore = ["D101", "D100", "D102", "D103", "D105", "D106", "D203", "E203", "E501", "C901"]
 
-select = ["B", "C", "E", "F", "W", "B9"]
+lint.select = ["B", "C", "E", "F", "W", "B9"]
 
 line-length = 88
 
@@ -44,5 +44,5 @@ quote-style = "single"
 [tool.ruff.lint.mccabe]
 max-complexity = 18
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F811"]

@@ -42,8 +42,7 @@ def generate_file_name():
     suffix = datetime.now().strftime('%x-%X')
     suffix = suffix.replace('/', '-')
     suffix = suffix.replace(':', '-')
-    file_name = f'{DEFAULT_FILE_NAME}_{suffix}.xlsx'
-    return file_name
+    return f'{DEFAULT_FILE_NAME}_{suffix}.xlsx'
 
 
 def validate_path(file_path: str):
@@ -74,10 +73,9 @@ def get_contracts():
     """
     Query contracts.
     """
-    queryset = Contrato.objects.filter(
+    return Contrato.objects.filter(
         tipo_produto=EnumTipoProduto.PORTABILIDADE_REFINANCIAMENTO
     )
-    return queryset
 
 
 def calculate_endorsed_dataprev(operation_key):
@@ -103,10 +101,8 @@ def calculate_qi_tech_status(proposal_key) -> str:
         return 'Proposal key is None'
 
     qi_tech_data = qi_getter.get_credit_transfer(proposal_key)
-    status = qi_tech_data.get('proposal_status')
-    if not status:
-        status = 'Não retornado'
-    return status
+
+    return qi_tech_data.get('proposal_status') or 'Não retornado'
 
 
 def calculate_last_tentative_port(proposal_key) -> tuple:
