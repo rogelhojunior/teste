@@ -70,17 +70,16 @@ def consulta_matricula(numero_cpf, averbadora, codigo_convenio, numero_matricula
 
     if 'error' in response_data:
         return [], 'Erro_Consulta'
-    else:
-        try:
-            # Filtrando a resposta da API para obter apenas os dados com a matrícula desejada
-            filtered_response_data = [
-                item
-                for item in response_data
-                if item['numeroMatricula'] == numero_matricula
-            ]
-        except Exception as e:
-            logger.error(f'Erro ao filtrar a resposta da API: {e}', exc_info=True)
-            return [], 'Erro_Filtrar'
+
+    try:
+        filtered_response_data = [
+            item
+            for item in response_data
+            if item['numeroMatricula'] == numero_matricula
+        ]
+    except Exception as e:
+        logger.error(f'Erro ao filtrar a resposta da API: {e}', exc_info=True)
+        return [], 'Erro_Filtrar'
 
     if not filtered_response_data:
         logger.warning(

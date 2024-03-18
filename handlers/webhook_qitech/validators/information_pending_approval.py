@@ -130,8 +130,6 @@ class ProposalInformationPendingApprovalValidator:
                 msg=f'Pending reason {e.endorsement_error_type} not valid for internal treatment',
                 exc_info=True,
             )
-            # Log and do nothing
-            pass
         except ObjectDoesNotExist as e:
             logger.exception(
                 'proposal not found', extra={'payload_webhook': self.payload_webhook}

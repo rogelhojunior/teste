@@ -454,7 +454,7 @@ class QiTech:
     ) -> requests.Response:
         from handlers.webhook_qitech.enums import PendencyReasonEnum
 
-        if request_type == 'portability' or request_type == 'new_credit':
+        if request_type in {'portability', 'new_credit'}:
             resource = 'endorsement_port_new_credit_correction'
             method = 'PATCH'
             if type_correction in (
