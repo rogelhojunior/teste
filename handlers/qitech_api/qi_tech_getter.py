@@ -9,8 +9,7 @@ from handlers.qitech_api.utils import extract_decoded_content, send_get_to_qi_te
 class QiTechGetter:
     def get(self, endpoint: str) -> dict:
         response = send_get_to_qi_tech(endpoint)
-        decoded_content = extract_decoded_content(response)
-        return decoded_content
+        return extract_decoded_content(response)
 
     def get_debt(self, operation_key: str) -> dict:
         endpoint = QI_TECH_ENDPOINTS['debt'] + operation_key

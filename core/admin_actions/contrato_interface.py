@@ -68,8 +68,7 @@ class ContratoInterface:
         return self.build_waning_message('refinanciamento')
 
     def build_missing_product_warning_message(self, product: str) -> str:
-        msg = 'Contrato %d não possui %s' % (self.contrato.id, product)
-        return msg
+        return 'Contrato %d não possui %s' % (self.contrato.id, product)
 
     def build_multiple_port_warning_message(self) -> str:
         return self.build_multiple_products_warning_message('portabilidade')
@@ -78,15 +77,13 @@ class ContratoInterface:
         return self.build_multiple_products_warning_message('refinanciamento')
 
     def build_multiple_products_warning_message(self, product: str) -> str:
-        msg = 'Contrato %d possui múltiplos contratos de %s' % (
+        return 'Contrato %d possui múltiplos contratos de %s' % (
             self.contrato.id,
             product,
         )
-        return msg
 
     def get_operation_key(self) -> str:
-        operation_key = self.refin.chave_operacao
-        return operation_key
+        return self.refin.chave_operacao
 
     def endorse_port(self) -> None:
         self.port.status = ContractStatus.INT_FINALIZADO.value

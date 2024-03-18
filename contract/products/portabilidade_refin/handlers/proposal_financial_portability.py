@@ -157,11 +157,10 @@ class RefuseProposalFinancialFreeMargin(HandleProposalFinancialPortability):
             'webhook_type': 'debt',
             'event_datetime': f'{data_final}',
         }
-        corpo_requisicao = {
+        return {
             'complex_operation': True,
             'operation_batch': body,
         }
-        return corpo_requisicao
 
     def set_response(self):
         qitech = handlers.qitech.QiTech()
@@ -348,10 +347,10 @@ class SubmitFinancialPortabilityProposal(HandleProposalFinancialPortability):
 
         endpoint = QI_TECH_ENDPOINTS['credit_transfer'] + self.proposal_key
         consulta = execute_qi_tech_get(endpoint).data
-        consulta_status = 'proposal_status' in consulta and consulta[
-            'proposal_status'
-        ] in ('pending_response', 'pending_acceptance')
-        return consulta_status
+        return 'proposal_status' in consulta and consulta['proposal_status'] in (
+            'pending_response',
+            'pending_acceptance'
+        )
 
     def generate_message(self, success=False, exception=None):
         base_message = (

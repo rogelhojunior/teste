@@ -244,8 +244,7 @@ class RegularizacaoContrato(models.Model):
         Gets original URL without query params
         Generates presigned key if url is not expired yet.
         """
-        url = self.anexo_url_pendencia
-        return url
+        return self.anexo_url_pendencia
 
     @property
     def get_attachment_url_regularizacao(self) -> str:

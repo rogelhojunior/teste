@@ -251,10 +251,9 @@ def criar_nome_arquivo(operacao_sequencial):
     today = datetime.now()
     maior_sequencial = get_maior_sequencial(operacao_sequencial) or 1
     maior_sequencial_nome = f'{maior_sequencial}'.rjust(6, '0')
-    nome_arquivo = (
+    return (
         f"{operacao_sequencial}_{maior_sequencial_nome}_{today.strftime('%d%m%Y')}.txt"
     )
-    return nome_arquivo
 
 
 def criar_identificacao_nova(identificacao_seguro, nova_id_seq):

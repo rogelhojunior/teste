@@ -472,8 +472,7 @@ class EnvioLinkFormalizacaoAPIView(GenericAPIView):
                         }
                     elif (
                         contrato.cliente
-                        and contrato.cliente.escolaridade
-                        == EnumEscolaridade.ANALFABETO
+                        and contrato.cliente.escolaridade == EnumEscolaridade.ANALFABETO
                     ):
                         payload = {
                             **api_contrato.LinkFormalizacaoAnalfabetoSerializer(

@@ -1756,11 +1756,11 @@ class AtualizarCliente(UpdateAPIView):
         return dados_bancarios, updated, defaults
 
     def find_current_account_details(self, cliente, pk):
-        queryset = DadosBancarios.objects.filter(cliente=cliente).order_by(
-            '-updated_at'
+        return (
+            DadosBancarios.objects.filter(cliente=cliente)
+            .order_by('-updated_at')
+            .first()
         )
-        instancia = queryset.first()
-        return instancia
 
     def _log_changes(self, alteracoes, cliente):
         for field, values in alteracoes.items():
