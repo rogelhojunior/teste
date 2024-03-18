@@ -349,7 +349,7 @@ class SubmitFinancialPortabilityProposal(HandleProposalFinancialPortability):
         consulta = execute_qi_tech_get(endpoint).data
         return 'proposal_status' in consulta and consulta['proposal_status'] in (
             'pending_response',
-            'pending_acceptance'
+            'pending_acceptance',
         )
 
     def generate_message(self, success=False, exception=None):

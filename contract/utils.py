@@ -21,7 +21,7 @@ def get_viewable_contracts(user) -> Contrato.objects:
     :param user: Usuário para que seus grupos sejam verificados.
     :return: Queryset de Contrato
     """
-    if ENVIRONMENT == 'STAGING' or ENVIRONMENT == 'DEV':
+    if ENVIRONMENT in ['STAGING', 'DEV']:
         nivel_hierarquia_usuario = user.nivel_hierarquia
         # Verificar se o usuário é um representante comercial
         is_representante_comercial = user.representante_comercial
@@ -205,10 +205,7 @@ def get_contrato_status_name(number: int) -> str:
     Given a status number, return the name for this status displayed on
     BackOffice, this means, an human readable name.
     """
-    for item in STATUS_NAME:
-        if item[0] == number:
-            return item[1]
-    return None
+    return next((item[1] for item in STATUS_NAME if item[0] == number), None)
 
 
 def get_tipo_conta_name(number: int) -> str:
@@ -216,7 +213,4 @@ def get_tipo_conta_name(number: int) -> str:
     Given a status number, return the name for this status displayed on
     BackOffice, this means, an human readable name.
     """
-    for item in TIPOS_CONTA:
-        if item[0] == number:
-            return item[1]
-    return None
+    return next((item[1] for item in TIPOS_CONTA if item[0] == number), None)

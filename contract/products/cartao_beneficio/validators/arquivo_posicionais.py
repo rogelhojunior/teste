@@ -221,7 +221,7 @@ def calcular_cf(
 ):
     td = diferenca + 1
 
-    if eh_bissexto(datetime.today().year):
+    if eh_bissexto(datetime.now().year):
         tv = calcular_dias_de_vigencia(
             inicio_vigencia,
             datetime(

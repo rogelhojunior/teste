@@ -217,9 +217,9 @@ class BuscarCEP(APIView):
             )
 
         try:
-            address = self.get_address_from_cep(cep, webservice='VIACEP')
-            if not address:
-                address = self.get_address_from_cep(cep, webservice='APICEP')
+            address = self.get_address_from_cep(
+                cep, webservice='VIACEP'
+            ) or self.get_address_from_cep(cep, webservice='APICEP')
 
             if not address:
                 return Response(
